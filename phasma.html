@@ -349,11 +349,11 @@
         }
 
         h1 {
-          font-size: 1.2em;
+          display: none;
         }
-
+        /* скрыть h2 */
         h2 {
-          font-size: 1em;
+          display: none;
         }
 
         .difficulty-buttons {
@@ -382,6 +382,40 @@
       }
 
       @media (max-width: 480px) {
+        h1 {
+          display: none;
+        }
+        /* скрыть h2 */
+        h2 {
+          display: none;
+        }
+        body {
+          padding: 0px;
+        }
+
+        #possible-ghosts {
+          padding: 10px;
+          border: 1px solid #333;
+          border-radius: 5px;
+          text-align: center;
+          margin-top: 10px;
+        }
+
+        #possible-ghosts ul {
+          list-style: none;
+          padding: 0;
+          margin-top: 0px;
+          margin-bottom: 0px;
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          gap: 10px;
+        }
+
+        #possible-ghosts li {
+          padding: 4px 0;
+          font-size: 1.1em;
+        }
+
         .difficulty-btn {
           padding: 8px 6px;
           flex-direction: column;
@@ -390,6 +424,13 @@
 
         .clue-item span {
           font-size: 0.9em;
+        }
+
+        .clue-list {
+          border: 1px solid #333;
+          padding: 5px;
+          border-radius: 5px;
+          margin-bottom: 5px;
         }
 
         .difficulty-btn .btn-text {
@@ -430,6 +471,10 @@
           width: 30px;
           height: 30px;
           font-size: 0.8em;
+        }
+        footer {
+          font-size: 0.7em;
+          margin: 10px;
         }
       }
     </style>
