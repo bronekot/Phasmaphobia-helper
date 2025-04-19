@@ -1,821 +1,936 @@
 <!DOCTYPE html>
 <html lang="ru">
-    <head>
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <meta name="description"
-              content="Phasmophobia Helper - A Vue.js application to identify ghosts based on clues." />
-        <meta name="keywords"
-              content="Phasmophobia, Ghost Helper, Vue.js, Clues, Ghost Identification" />
-        <meta name="author" content="TactiKot" />
-        <title>Phasmophobia Helper</title>
-        <link rel="stylesheet"
-              href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" />
-        <style>
-        body {
-            font-family: sans-serif;
-            background-color: #181818;
-            color: #f0f0f0;
-            margin: 0;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Phasmophobia Helper - A Vue.js application to identify ghosts based on clues."
+    />
+    <meta
+      name="keywords"
+      content="Phasmophobia, Ghost Helper, Vue.js, Clues, Ghost Identification"
+    />
+    <meta name="author" content="TactiKot" />
+    <title>Phasmophobia Helper</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
+    />
+    <style>
+      body {
+        font-family: sans-serif;
+        background-color: #181818;
+        color: #f0f0f0;
+        margin: 0;
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
 
+      .container {
+        background-color: #222;
+        padding: 30px;
+        border-radius: 8px;
+        box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+        width: 80%;
+        max-width: 900px;
+      }
+
+      h1,
+      h2 {
+        color: #eee;
+        text-align: center;
+        margin-bottom: 20px;
+      }
+
+      #difficulty-selector {
+        text-align: center;
+        margin-bottom: 20px;
+      }
+
+      .clue-list {
+        border: 1px solid #333;
+        padding: 15px;
+        border-radius: 5px;
+        margin-bottom: 30px;
+      }
+
+      .clue-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 12px 12px;
+        border-bottom: 1px solid #444;
+      }
+
+      .clue-item:last-child {
+        border-bottom: none;
+      }
+
+      .clue-buttons {
+        display: flex;
+      }
+
+      .clue-buttons button {
+        background-color: #555;
+        color: #eee;
+        border: none;
+        width: 36px;
+        height: 36px;
+        border-radius: 3px;
+        cursor: pointer;
+        font-size: 1em;
+        margin-left: 5px;
+        transition: background-color 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+      }
+
+      .clue-buttons button:hover {
+        background-color: #777;
+      }
+
+      .clue-buttons button .tooltip {
+        visibility: hidden;
+        width: 80px;
+        background-color: #333;
+        color: #fff;
+        text-align: center;
+        border-radius: 4px;
+        padding: 5px;
+        position: absolute;
+        z-index: 1;
+        bottom: 125%;
+        left: 50%;
+        margin-left: -40px;
+        opacity: 0;
+        transition: opacity 0.3s;
+        font-size: 0.8em;
+        pointer-events: none;
+      }
+
+      .clue-buttons button:hover .tooltip {
+        visibility: visible;
+        opacity: 1;
+        transition: opacity 0.2s;
+      }
+
+      .clue-item.found {
+        background-color: #4caf50;
+        color: #fff;
+      }
+
+      .clue-item.excluded {
+        background-color: #f44336;
+        color: #fff;
+      }
+
+      .clue-item.inactive {
+        color: #777;
+      }
+
+      #possible-ghosts {
+        margin-top: 20px;
+        padding: 20px;
+        border: 1px solid #333;
+        border-radius: 5px;
+        text-align: center;
+      }
+
+      #possible-ghosts h2 {
+        margin-top: 0;
+      }
+
+      #possible-ghosts ul {
+        list-style: none;
+        padding: 0;
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 10px;
+      }
+
+      #possible-ghosts li {
+        padding: 8px 0;
+        font-size: 1.1em;
+      }
+
+      #possible-ghosts li.inactive {
+        color: #777;
+      }
+
+      .difficulty-buttons {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 10px;
+        margin: 20px 0;
+      }
+
+      .difficulty-btn {
+        padding: 10px 15px;
+        border-radius: 6px;
+        background-color: #333;
+        border: 2px solid transparent;
+        color: #ddd;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 1em;
+        position: relative;
+      }
+
+      .difficulty-btn:hover {
+        background-color: #444;
+      }
+
+      .difficulty-btn.active {
+        border-color: #fff;
+        box-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+      }
+
+      .difficulty-btn i {
+        font-size: 1.1em;
+      }
+
+      .difficulty-btn.amateur.active {
+        border-color: #4caf50;
+        background-color: rgba(76, 175, 80, 0.2);
+      }
+
+      .difficulty-btn.intermediate.active {
+        border-color: #2196f3;
+        background-color: rgba(33, 150, 243, 0.2);
+      }
+
+      .difficulty-btn.professional.active {
+        border-color: #ff9800;
+        background-color: rgba(255, 152, 0, 0.2);
+      }
+
+      .difficulty-btn.nightmare.active {
+        border-color: #f44336;
+        background-color: rgba(244, 67, 54, 0.2);
+      }
+
+      .difficulty-btn.insanity.active {
+        border-color: #9c27b0;
+        background-color: rgba(156, 39, 176, 0.2);
+      }
+
+      .switch {
+        position: relative;
+        display: inline-block;
+        width: 50px;
+        height: 24px;
+        vertical-align: middle;
+      }
+      .switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+      }
+      .slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: #555;
+        transition: 0.4s;
+        border-radius: 24px;
+      }
+      .slider:before {
+        position: absolute;
+        content: "";
+        height: 18px;
+        width: 18px;
+        left: 3px;
+        bottom: 3px;
+        background-color: #eee;
+        transition: 0.4s;
+        border-radius: 50%;
+      }
+      .switch input:checked + .slider {
+        background-color: #4caf50;
+      }
+      .switch input:checked + .slider:before {
+        transform: translateX(26px);
+      }
+
+      .switch-label {
+        margin-left: 8px;
+        vertical-align: middle;
+        cursor: pointer;
+        color: #f0f0f0;
+      }
+
+      footer {
+        text-align: center;
+        color: #aaa;
+        font-size: 0.9em;
+        margin-top: 30px;
+      }
+
+      .switch-wrapper {
+        margin: 20px 0;
+        text-align: center;
+      }
+
+      .clue-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 10px;
+      }
+
+      .clue-header h3 {
+        margin: 0;
+      }
+
+      .reset-all-btn {
+        background-color: #757575;
+        color: #eee;
+        border: none;
+        width: 36px;
+        height: 36px;
+        border-radius: 3px;
+        cursor: pointer;
+        font-size: 1em;
+        transition: background-color 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+      }
+
+      .reset-all-btn:hover {
+        background-color: #9e9e9e;
+      }
+
+      .reset-all-btn .tooltip {
+        visibility: hidden;
+        width: 100px;
+        background-color: #333;
+        color: #fff;
+        text-align: center;
+        border-radius: 4px;
+        padding: 5px;
+        position: absolute;
+        z-index: 1;
+        bottom: 125%;
+        left: 50%;
+        margin-left: -50px;
+        opacity: 0;
+        transition: opacity 0.3s;
+        font-size: 0.8em;
+        pointer-events: none;
+      }
+
+      .reset-all-btn:hover .tooltip {
+        visibility: visible;
+        opacity: 1;
+      }
+
+      @media (max-width: 768px) {
         .container {
-            background-color: #222;
-            padding: 30px;
-            border-radius: 8px;
-            box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
-            width: 80%;
-            max-width: 900px;
-        }
-
-        h1,
-        h2 {
-            color: #eee;
-            text-align: center;
-            margin-bottom: 20px;
-        }
-
-        #difficulty-selector {
-            text-align: center;
-            margin-bottom: 20px;
-        }
-
-        .clue-list {
-            border: 1px solid #333;
-            padding: 15px;
-            border-radius: 5px;
-            margin-bottom: 30px;
+          width: 95%;
+          padding: 15px;
         }
 
         .clue-item {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 12px 12px;
-            border-bottom: 1px solid #444;
+          padding: 6px 8px;
         }
 
-        .clue-item:last-child {
-            border-bottom: none;
+        h1 {
+          font-size: 1.2em;
         }
 
-        .clue-buttons {
-            display: flex;
-        }
-
-        .clue-buttons button {
-            background-color: #555;
-            color: #eee;
-            border: none;
-            width: 36px;
-            height: 36px;
-            border-radius: 3px;
-            cursor: pointer;
-            font-size: 1em;
-            margin-left: 5px;
-            transition: background-color 0.3s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-        }
-
-        .clue-buttons button:hover {
-            background-color: #777;
-        }
-
-        .clue-buttons button .tooltip {
-            visibility: hidden;
-            width: 80px;
-            background-color: #333;
-            color: #fff;
-            text-align: center;
-            border-radius: 4px;
-            padding: 5px;
-            position: absolute;
-            z-index: 1;
-            bottom: 125%;
-            left: 50%;
-            margin-left: -40px;
-            opacity: 0;
-            transition: opacity 0.3s;
-            font-size: 0.8em;
-            pointer-events: none;
-        }
-
-        .clue-buttons button:hover .tooltip {
-            visibility: visible;
-            opacity: 1;
-            transition: opacity 0.2s;
-        }
-
-        .clue-item.found {
-            background-color: #4caf50;
-            color: #fff;
-        }
-
-        .clue-item.excluded {
-            background-color: #f44336;
-            color: #fff;
-        }
-
-        .clue-item.inactive {
-            color: #777;
-        }
-
-        #possible-ghosts {
-            margin-top: 20px;
-            padding: 20px;
-            border: 1px solid #333;
-            border-radius: 5px;
-            text-align: center;
-        }
-
-        #possible-ghosts h2 {
-            margin-top: 0;
-        }
-
-        #possible-ghosts ul {
-            list-style: none;
-            padding: 0;
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 10px;
-        }
-
-        #possible-ghosts li {
-            padding: 8px 0;
-            font-size: 1.1em;
-        }
-
-        #possible-ghosts li.inactive {
-            color: #777;
+        h2 {
+          font-size: 1em;
         }
 
         .difficulty-buttons {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 10px;
-            margin: 20px 0;
+          display: flex;
+          flex-wrap: nowrap;
+          overflow-x: auto;
+          justify-content: flex-start;
+          padding-bottom: 10px;
+          gap: 5px;
+          -webkit-overflow-scrolling: touch;
+          scrollbar-width: thin;
         }
 
         .difficulty-btn {
-            padding: 10px 15px;
-            border-radius: 6px;
-            background-color: #333;
-            border: 2px solid transparent;
-            color: #ddd;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 1em;
-            position: relative;
+          padding: 8px 10px;
+          flex-shrink: 0;
+          font-size: 0.9em;
+          white-space: nowrap;
         }
 
-        .difficulty-btn:hover {
-            background-color: #444;
+        .reset-all-btn {
+          width: 32px;
+          height: 32px;
+          font-size: 0.9em;
+        }
+      }
+
+      @media (max-width: 480px) {
+        .difficulty-btn {
+          padding: 8px 6px;
+          flex-direction: column;
+          gap: 4px;
         }
 
-        .difficulty-btn.active {
-            border-color: #fff;
-            box-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+        .clue-item span {
+          font-size: 0.9em;
+        }
+
+        .difficulty-btn .btn-text {
+          display: none;
         }
 
         .difficulty-btn i {
-            font-size: 1.1em;
+          font-size: 1.3em;
         }
 
-        .difficulty-btn.amateur.active {
-            border-color: #4caf50;
-            background-color: rgba(76, 175, 80, 0.2);
+        .difficulty-btn::after {
+          content: attr(data-label);
+          font-size: 0.7em;
+          display: block;
+          text-align: center;
+          margin-top: 2px;
         }
 
-        .difficulty-btn.intermediate.active {
-            border-color: #2196f3;
-            background-color: rgba(33, 150, 243, 0.2);
-        }
-
-        .difficulty-btn.professional.active {
-            border-color: #ff9800;
-            background-color: rgba(255, 152, 0, 0.2);
-        }
-
-        .difficulty-btn.nightmare.active {
-            border-color: #f44336;
-            background-color: rgba(244, 67, 54, 0.2);
-        }
-
-        .difficulty-btn.insanity.active {
-            border-color: #9c27b0;
-            background-color: rgba(156, 39, 176, 0.2);
-        }
-
-        @media (max-width: 768px) {
-            .container {
-                width: 95%;
-                padding: 15px;
-            }
-
-            .clue-item {
-                padding: 6px 8px;
-            }
-
-            /* .clue-buttons {
-                gap: 3px;
-            } */
-
-            /* .clue-item span {
-                font-size: 0.9em;
-            } */
-
-            h1 {
-                font-size: 1.2em;
-            }
-
-            h2 {
-                font-size: 1em;
-            }
-        
-            .difficulty-buttons {
-                display: flex;
-                flex-wrap: nowrap;
-                overflow-x: auto;
-                justify-content: flex-start;
-                padding-bottom: 10px;
-                gap: 5px;
-                -webkit-overflow-scrolling: touch;
-                scrollbar-width: thin;
-            }
-
-            .difficulty-btn {
-                padding: 8px 10px;
-                flex-shrink: 0;
-                font-size: 0.9em;
-                white-space: nowrap;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .difficulty-btn {
-                padding: 8px 6px;
-                flex-direction: column;
-                gap: 4px;
-            }
-
-            .clue-item span {
-                font-size: 0.9em;
-            }
-
-            .difficulty-btn .btn-text {
-                display: none;
-            }
-
-            .difficulty-btn i {
-                font-size: 1.3em;
-            }
-            
-            .difficulty-btn::after {
-                content: attr(data-label);
-                font-size: 0.7em;
-                display: block;
-                text-align: center;
-                margin-top: 2px;
-            }
-
-            /* Уменьшенный переключатель для мобильных */
-            .switch {
-                width: 40px;
-                height: 20px;
-            }
-            .slider:before {
-                width: 16px;
-                height: 16px;
-                left: 2px;
-                bottom: 2px;
-            }
-            .switch input:checked + .slider:before {
-                transform: translateX(20px);
-            }
-            .switch-label {
-                display: block;
-                margin-top: 5px;
-                font-size: 0.9em;
-            }
-        }
-
-        /* Toggle Switch */
         .switch {
-            position: relative;
-            display: inline-block;
-            width: 50px;
-            height: 24px;
-            vertical-align: middle;
-        }
-        .switch input {
-            opacity: 0;
-            width: 0;
-            height: 0;
-        }
-        .slider {
-            position: absolute;
-            cursor: pointer;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: #555;
-            transition: .4s;
-            border-radius: 24px;
+          width: 40px;
+          height: 20px;
         }
         .slider:before {
-            position: absolute;
-            content: "";
-            height: 18px;
-            width: 18px;
-            left: 3px;
-            bottom: 3px;
-            background-color: #eee;
-            transition: .4s;
-            border-radius: 50%;
-        }
-        .switch input:checked + .slider {
-            background-color: #4caf50;
+          width: 16px;
+          height: 16px;
+          left: 2px;
+          bottom: 2px;
         }
         .switch input:checked + .slider:before {
-            transform: translateX(26px);
+          transform: translateX(20px);
         }
-
-        /* Toggle Switch Label */
         .switch-label {
-            margin-left: 8px;
-            vertical-align: middle;
-            cursor: pointer;
-            color: #f0f0f0;
+          display: block;
+          margin-top: 5px;
+          font-size: 0.9em;
         }
-
-        /* Footer styling */
-        footer {
-            text-align: center;
-            color: #aaa;
-            font-size: 0.9em;
-            margin-top: 30px;
+        .reset-all-btn {
+          width: 30px;
+          height: 30px;
+          font-size: 0.8em;
         }
-
-        .switch-wrapper {
-            margin: 20px 0;
-            text-align: center;
-        }
-        </style>
-    </head>
-    <body>
-        <div id="app" class="container">
-            <h1>Phasmophobia Ghost Identifier</h1>
-            <div id="difficulty-selector">
-                <h2>Выберите сложность:</h2>
-                <div class="difficulty-buttons">
-                    <button @click="difficulty = 'amateur'"
-                            :class="['difficulty-btn', 'amateur', { active: difficulty === 'amateur' }]"
-                            data-label="Любитель">
-                        <i class="fas fa-baby"></i>
-                        <span class="btn-text">Любитель</span>
-                    </button>
-                    <button @click="difficulty = 'intermediate'"
-                            :class="['difficulty-btn', 'intermediate', { active: difficulty === 'intermediate' }]"
-                            data-label="Средняя">
-                        <i class="fas fa-user"></i>
-                        <span class="btn-text">Средняя</span>
-                    </button>
-                    <button @click="difficulty = 'professional'"
-                            :class="['difficulty-btn', 'professional', { active: difficulty === 'professional' }]"
-                            data-label="Профессионал">
-                        <i class="fas fa-user-tie"></i>
-                        <span class="btn-text">Профессионал</span>
-                    </button>
-                    <button @click="difficulty = 'nightmare'"
-                            :class="['difficulty-btn', 'nightmare', { active: difficulty === 'nightmare' }]"
-                            data-label="Кошмар">
-                        <i class="fas fa-skull"></i>
-                        <span class="btn-text">Кошмар</span>
-                    </button>
-                    <button @click="difficulty = 'insanity'"
-                            :class="['difficulty-btn', 'insanity', { active: difficulty === 'insanity' }]"
-                            data-label="Безумие">
-                        <i class="fas fa-dizzy"></i>
-                        <span class="btn-text">Безумие</span>
-                    </button>
-                </div>
-            </div>
-            <div class="clue-list">
-                <h3>Улики</h3>
-                <div v-for="clue in allClues"
-                     :key="clue"
-                     class="clue-item"
-                     :class="{ found: clueStates[clue] === 'found', excluded: clueStates[clue] === 'excluded', inactive: !isClueRelevant(clue) && clueStates[clue] !== 'found' && clueStates[clue] !== 'excluded' }">
-                    <span>{{ clue }}</span>
-                    <div class="clue-buttons">
-                        <button @click="confirmClue(clue)" :disabled="clueStates[clue] === 'found'">
-                            <i class="fas fa-check"></i>
-                            <span class="tooltip">Подтвердить</span>
-                        </button>
-                        <button @click="clearClue(clue)" :disabled="clueStates[clue] === null">
-                            <i class="fas fa-undo"></i>
-                            <span class="tooltip">Сбросить</span>
-                        </button>
-                        <button @click="excludeClue(clue)"
-                                :disabled="clueStates[clue] === 'excluded'">
-                            <i class="fas fa-times"></i>
-                            <span class="tooltip">Вычеркнуть</span>
-                        </button>
-                    </div>
-                </div>
-            </div>
-            <div id="possible-ghosts">
-                <h2>Возможные призраки</h2>
-                <ul v-if="showAllGhosts || possibleGhosts.length > 0">
-                    <li v-for="ghost in showAllGhosts ? ghostsData : possibleGhosts"
-                        :key="ghost.name"
-                        :class="{ inactive: showAllGhosts && possibleGhosts.indexOf(ghost) === -1 }">
-                        {{ ghost.name }}
-                    </li>
-                </ul>
-                <p v-else>Выберите улики</p>
-            </div>
-            <div class="switch-wrapper">
-                <label class="switch">
-                    <input type="checkbox" v-model="showAllGhosts" />
-                    <span class="slider"></span>
-                </label>
-                <span class="switch-label">Показывать всех призраков (затенять отфильтрованных)</span>
-            </div>
+      }
+    </style>
+  </head>
+  <body>
+    <div id="app" class="container">
+      <h1>Phasmophobia Ghost Identifier</h1>
+      <div id="difficulty-selector">
+        <h2>Выберите сложность:</h2>
+        <div class="difficulty-buttons">
+          <button
+            @click="difficulty = 'amateur'"
+            :class="['difficulty-btn', 'amateur', { active: difficulty === 'amateur' }]"
+            data-label="Любитель"
+          >
+            <i class="fas fa-baby"></i>
+            <span class="btn-text">Любитель</span>
+          </button>
+          <button
+            @click="difficulty = 'intermediate'"
+            :class="['difficulty-btn', 'intermediate', { active: difficulty === 'intermediate' }]"
+            data-label="Средняя"
+          >
+            <i class="fas fa-user"></i>
+            <span class="btn-text">Средняя</span>
+          </button>
+          <button
+            @click="difficulty = 'professional'"
+            :class="['difficulty-btn', 'professional', { active: difficulty === 'professional' }]"
+            data-label="Профессионал"
+          >
+            <i class="fas fa-user-tie"></i>
+            <span class="btn-text">Профессионал</span>
+          </button>
+          <button
+            @click="difficulty = 'nightmare'"
+            :class="['difficulty-btn', 'nightmare', { active: difficulty === 'nightmare' }]"
+            data-label="Кошмар"
+          >
+            <i class="fas fa-skull"></i>
+            <span class="btn-text">Кошмар</span>
+          </button>
+          <button
+            @click="difficulty = 'insanity'"
+            :class="['difficulty-btn', 'insanity', { active: difficulty === 'insanity' }]"
+            data-label="Безумие"
+          >
+            <i class="fas fa-dizzy"></i>
+            <span class="btn-text">Безумие</span>
+          </button>
         </div>
-        <!-- end #app -->
-        <footer>
-            © 2025 Phasmophobia Helper. Разработано TactiKot с ❤️
-        </footer>
-        <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
-        <script>
-        const { createApp, ref, computed } = Vue;
+      </div>
+      <div class="clue-list">
+        <div class="clue-header">
+          <h3>Улики</h3>
+          <button @click="resetAllClues" class="reset-all-btn">
+            <i class="fas fa-sync-alt"></i>
+            <span class="tooltip">Сбросить все</span>
+          </button>
+        </div>
+        <div
+          v-for="clue in allClues"
+          :key="clue"
+          class="clue-item"
+          :class="{ found: clueStates[clue] === 'found', excluded: clueStates[clue] === 'excluded', inactive: !isClueRelevant(clue) && clueStates[clue] !== 'found' && clueStates[clue] !== 'excluded' }"
+        >
+          <span>{{ clue }}</span>
+          <div class="clue-buttons">
+            <button
+              @click="confirmClue(clue)"
+              :disabled="clueStates[clue] === 'found'"
+            >
+              <i class="fas fa-check"></i>
+              <span class="tooltip">Подтвердить</span>
+            </button>
+            <button
+              @click="clearClue(clue)"
+              :disabled="clueStates[clue] === null"
+            >
+              <i class="fas fa-undo"></i>
+              <span class="tooltip">Сбросить</span>
+            </button>
+            <button
+              @click="excludeClue(clue)"
+              :disabled="clueStates[clue] === 'excluded'"
+            >
+              <i class="fas fa-times"></i>
+              <span class="tooltip">Вычеркнуть</span>
+            </button>
+          </div>
+        </div>
+      </div>
+      <div id="possible-ghosts">
+        <h2>Возможные призраки</h2>
+        <ul v-if="showAllGhosts || possibleGhosts.length > 0">
+          <li
+            v-for="ghost in showAllGhosts ? ghostsData : possibleGhosts"
+            :key="ghost.name"
+            :class="{ inactive: showAllGhosts && possibleGhosts.indexOf(ghost) === -1 }"
+          >
+            {{ ghost.name }}
+          </li>
+        </ul>
+        <p v-else>Выберите улики</p>
+      </div>
+      <div class="switch-wrapper">
+        <label class="switch">
+          <input type="checkbox" v-model="showAllGhosts" />
+          <span class="slider"></span>
+        </label>
+        <span class="switch-label"
+          >Показывать всех призраков (затенять отфильтрованных)</span
+        >
+      </div>
+    </div>
+    <footer>© 2025 Phasmophobia Helper. Разработано TactiKot с ❤️</footer>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script>
+      const { createApp, ref, computed } = Vue;
 
-        const app = createApp({
-            data() {
-                return {
-                    difficulty: "amateur",
-                    allClues: [
-                        "ЭМП 5 уровня",
-                        "Ультрафиолет",
-                        "Записи в блокноте",
-                        "Минусовая температура",
-                        "Лазерный проектор",
-                        "Призрачный огонёк",
-                        "Радиоприёмник",
-                    ],
-                    ghostsData: [
-                        {
-                            name: "Дух",
-                            clues: ["ЭМП 5 уровня", "Записи в блокноте", "Радиоприёмник"],
-                        },
-                        {
-                            name: "Мираж",
-                            clues: ["ЭМП 5 уровня", "Радиоприёмник", "Лазерный проектор"],
-                        },
-                        {
-                            name: "Фантом",
-                            clues: ["Ультрафиолет", "Радиоприёмник", "Лазерный проектор"],
-                        },
-                        {
-                            name: "Полтергейст",
-                            clues: ["Записи в блокноте", "Ультрафиолет", "Радиоприёмник"],
-                        },
-                        {
-                            name: "Банши",
-                            clues: [
-                                "Ультрафиолет",
-                                "Призрачный огонёк",
-                                "Лазерный проектор",
-                            ],
-                        },
-                        {
-                            name: "Джинн",
-                            clues: [
-                                "ЭМП 5 уровня",
-                                "Ультрафиолет",
-                                "Минусовая температура",
-                            ],
-                        },
-                        {
-                            name: "Мара",
-                            clues: [
-                                "Записи в блокноте",
-                                "Радиоприёмник",
-                                "Призрачный огонёк",
-                            ],
-                        },
-                        {
-                            name: "Ревенант",
-                            clues: [
-                                "Записи в блокноте",
-                                "Минусовая температура",
-                                "Призрачный огонёк",
-                            ],
-                        },
-                        {
-                            name: "Тень",
-                            clues: [
-                                "ЭМП 5 уровня",
-                                "Записи в блокноте",
-                                "Минусовая температура",
-                            ],
-                        },
-                        {
-                            name: "Демон",
-                            clues: [
-                                "Записи в блокноте",
-                                "Ультрафиолет",
-                                "Минусовая температура",
-                            ],
-                        },
-                        {
-                            name: "Юрей",
-                            clues: [
-                                "Минусовая температура",
-                                "Призрачный огонёк",
-                                "Лазерный проектор",
-                            ],
-                        },
-                        {
-                            name: "Они",
-                            clues: [
-                                "ЭМП 5 уровня",
-                                "Минусовая температура",
-                                "Лазерный проектор",
-                            ],
-                        },
-                        {
-                            name: "Ёкай",
-                            clues: [
-                                "Радиоприёмник",
-                                "Призрачный огонёк",
-                                "Лазерный проектор",
-                            ],
-                        },
-                        {
-                            name: "Ханту",
-                            clues: [
-                                "Ультрафиолет",
-                                "Минусовая температура",
-                                "Призрачный огонёк",
-                            ],
-                            guaranteedClue: "Минусовая температура",
-                        },
-                        {
-                            name: "Горё",
-                            clues: ["ЭМП 5 уровня", "Ультрафиолет", "Лазерный проектор"],
-                            guaranteedClue: "Лазерный проектор",
-                        },
-                        {
-                            name: "Мюлинг",
-                            clues: ["ЭМП 5 уровня", "Записи в блокноте", "Ультрафиолет"],
-                        },
-                        {
-                            name: "Онрё",
-                            clues: [
-                                "Радиоприёмник",
-                                "Минусовая температура",
-                                "Призрачный огонёк",
-                            ],
-                        },
-                        {
-                            name: "Близнецы",
-                            clues: [
-                                "ЭМП 5 уровня",
-                                "Минусовая температура",
-                                "Радиоприёмник",
-                            ],
-                        },
-                        {
-                            name: "Райдзю",
-                            clues: [
-                                "ЭМП 5 уровня",
-                                "Призрачный огонёк",
-                                "Лазерный проектор",
-                            ],
-                        },
-                        {
-                            name: "Обакэ",
-                            clues: ["ЭМП 5 уровня", "Ультрафиолет", "Призрачный огонёк"],
-                            guaranteedClue: "Ультрафиолет",
-                        },
-                        {
-                            name: "Мимик",
-                            clues: [
-                                "Ультрафиолет",
-                                "Радиоприёмник",
-                                "Минусовая температура",
-                                "Призрачный огонёк",
-                            ],
-                            guaranteedClue: "Призрачный огонёк",
-                        },
-                        {
-                            name: "Морой",
-                            clues: [
-                                "Записи в блокноте",
-                                "Минусовая температура",
-                                "Радиоприёмник",
-                            ],
-                            guaranteedClue: "Радиоприёмник",
-                        },
-                        {
-                            name: "Деоген",
-                            clues: [
-                                "Радиоприёмник",
-                                "Лазерный проектор",
-                                "Записи в блокноте",
-                            ],
-                            guaranteedClue: "Радиоприёмник",
-                        },
-                        {
-                            name: "Тайэ",
-                            clues: [
-                                "Записи в блокноте",
-                                "Призрачный огонёк",
-                                "Лазерный проектор",
-                            ],
-                        },
-                    ],
-                    clueStates: {},
-                    showAllGhosts: false,
-                };
-            },
-            created() {
-                const savedShowAllGhosts = localStorage.getItem('phasmaHelperShowAllGhosts');
-                if (savedShowAllGhosts !== null) {
-                    this.showAllGhosts = JSON.parse(savedShowAllGhosts);
+      const app = createApp({
+        data() {
+          return {
+            difficulty: "amateur",
+            allClues: [
+              "ЭМП 5 уровня",
+              "Ультрафиолет",
+              "Записи в блокноте",
+              "Минусовая температура",
+              "Лазерный проектор",
+              "Призрачный огонёк",
+              "Радиоприёмник",
+            ],
+            ghostsData: [
+              {
+                name: "Дух",
+                clues: ["ЭМП 5 уровня", "Записи в блокноте", "Радиоприёмник"],
+              },
+              {
+                name: "Мираж",
+                clues: ["ЭМП 5 уровня", "Радиоприёмник", "Лазерный проектор"],
+              },
+              {
+                name: "Фантом",
+                clues: ["Ультрафиолет", "Радиоприёмник", "Лазерный проектор"],
+              },
+              {
+                name: "Полтергейст",
+                clues: ["Записи в блокноте", "Ультрафиолет", "Радиоприёмник"],
+              },
+              {
+                name: "Банши",
+                clues: [
+                  "Ультрафиолет",
+                  "Призрачный огонёк",
+                  "Лазерный проектор",
+                ],
+              },
+              {
+                name: "Джинн",
+                clues: [
+                  "ЭМП 5 уровня",
+                  "Ультрафиолет",
+                  "Минусовая температура",
+                ],
+              },
+              {
+                name: "Мара",
+                clues: [
+                  "Записи в блокноте",
+                  "Радиоприёмник",
+                  "Призрачный огонёк",
+                ],
+              },
+              {
+                name: "Ревенант",
+                clues: [
+                  "Записи в блокноте",
+                  "Минусовая температура",
+                  "Призрачный огонёк",
+                ],
+              },
+              {
+                name: "Тень",
+                clues: [
+                  "ЭМП 5 уровня",
+                  "Записи в блокноте",
+                  "Минусовая температура",
+                ],
+              },
+              {
+                name: "Демон",
+                clues: [
+                  "Записи в блокноте",
+                  "Ультрафиолет",
+                  "Минусовая температура",
+                ],
+              },
+              {
+                name: "Юрей",
+                clues: [
+                  "Минусовая температура",
+                  "Призрачный огонёк",
+                  "Лазерный проектор",
+                ],
+              },
+              {
+                name: "Они",
+                clues: [
+                  "ЭМП 5 уровня",
+                  "Минусовая температура",
+                  "Лазерный проектор",
+                ],
+              },
+              {
+                name: "Ёкай",
+                clues: [
+                  "Радиоприёмник",
+                  "Призрачный огонёк",
+                  "Лазерный проектор",
+                ],
+              },
+              {
+                name: "Ханту",
+                clues: [
+                  "Ультрафиолет",
+                  "Минусовая температура",
+                  "Призрачный огонёк",
+                ],
+                guaranteedClue: "Минусовая температура",
+              },
+              {
+                name: "Горё",
+                clues: ["ЭМП 5 уровня", "Ультрафиолет", "Лазерный проектор"],
+                guaranteedClue: "Лазерный проектор",
+              },
+              {
+                name: "Мюлинг",
+                clues: ["ЭМП 5 уровня", "Записи в блокноте", "Ультрафиолет"],
+              },
+              {
+                name: "Онрё",
+                clues: [
+                  "Радиоприёмник",
+                  "Минусовая температура",
+                  "Призрачный огонёк",
+                ],
+              },
+              {
+                name: "Близнецы",
+                clues: [
+                  "ЭМП 5 уровня",
+                  "Минусовая температура",
+                  "Радиоприёмник",
+                ],
+              },
+              {
+                name: "Райдзю",
+                clues: [
+                  "ЭМП 5 уровня",
+                  "Призрачный огонёк",
+                  "Лазерный проектор",
+                ],
+              },
+              {
+                name: "Обакэ",
+                clues: ["ЭМП 5 уровня", "Ультрафиолет", "Призрачный огонёк"],
+                guaranteedClue: "Ультрафиолет",
+              },
+              {
+                name: "Мимик",
+                clues: [
+                  "Ультрафиолет",
+                  "Радиоприёмник",
+                  "Минусовая температура",
+                  "Призрачный огонёк",
+                ],
+                guaranteedClue: "Призрачный огонёк",
+              },
+              {
+                name: "Морой",
+                clues: [
+                  "Записи в блокноте",
+                  "Минусовая температура",
+                  "Радиоприёмник",
+                ],
+                guaranteedClue: "Радиоприёмник",
+              },
+              {
+                name: "Деоген",
+                clues: [
+                  "Радиоприёмник",
+                  "Лазерный проектор",
+                  "Записи в блокноте",
+                ],
+                guaranteedClue: "Радиоприёмник",
+              },
+              {
+                name: "Тайэ",
+                clues: [
+                  "Записи в блокноте",
+                  "Призрачный огонёк",
+                  "Лазерный проектор",
+                ],
+              },
+            ],
+            clueStates: {},
+            showAllGhosts: false,
+          };
+        },
+        created() {
+          const savedShowAllGhosts = localStorage.getItem(
+            "phasmaHelperShowAllGhosts"
+          );
+          if (savedShowAllGhosts !== null) {
+            this.showAllGhosts = JSON.parse(savedShowAllGhosts);
+          }
+
+          const savedDifficulty = localStorage.getItem(
+            "phasmaHelperDifficulty"
+          );
+          if (savedDifficulty !== null) {
+            const validDifficulties = [
+              "amateur",
+              "intermediate",
+              "professional",
+              "nightmare",
+              "insanity",
+            ];
+            if (validDifficulties.includes(savedDifficulty)) {
+              this.difficulty = savedDifficulty;
+            } else {
+              localStorage.removeItem("phasmaHelperDifficulty");
+            }
+          }
+
+          // Проверка на неиспользуемые улики
+          this.allClues.forEach((clue) => {
+            const isClueUsed = this.ghostsData.some((ghost) =>
+              ghost.clues.includes(clue)
+            );
+            if (!isClueUsed) {
+              console.warn(
+                `Внимание: Улика "${clue}" присутствует в allClues, но не используется ни одним призраком. Возможно, опечатка.`
+              );
+            }
+          });
+
+          // Проверка, что guaranteedClue присутствует в clues призрака
+          this.ghostsData.forEach((ghost) => {
+            if (
+              ghost.guaranteedClue &&
+              !ghost.clues.includes(ghost.guaranteedClue)
+            ) {
+              console.warn(
+                `Внимание: Для призрака "${ghost.name}" указана гарантированная улика "${ghost.guaranteedClue}", но она отсутствует в его основном списке улик.`
+              );
+            }
+          });
+
+          this.allClues.forEach((clue) => {
+            this.clueStates[clue] = null;
+          });
+        },
+        computed: {
+          foundClues() {
+            return Object.keys(this.clueStates).filter(
+              (clue) => this.clueStates[clue] === "found"
+            );
+          },
+          excludedClues() {
+            return Object.keys(this.clueStates).filter(
+              (clue) => this.clueStates[clue] === "excluded"
+            );
+          },
+          possibleGhosts() {
+            return this.ghostsData.filter((ghost) => {
+              if (
+                ghost.guaranteedClue &&
+                this.excludedClues.includes(ghost.guaranteedClue)
+              ) {
+                return false;
+              }
+
+              let foundMatchCount = 0;
+              let excludedMatchCount = 0;
+
+              for (const clue of ghost.clues) {
+                if (this.foundClues.includes(clue)) {
+                  foundMatchCount++;
                 }
-
-                const savedDifficulty = localStorage.getItem('phasmaHelperDifficulty');
-                if (savedDifficulty !== null) {
-                    const validDifficulties = ['amateur', 'intermediate', 'professional', 'nightmare', 'insanity'];
-                    if (validDifficulties.includes(savedDifficulty)) {
-                        this.difficulty = savedDifficulty;
-                    } else {
-                        localStorage.removeItem('phasmaHelperDifficulty');
-                    }
+                if (this.excludedClues.includes(clue)) {
+                  excludedMatchCount++;
                 }
+              }
 
-                // Проверка на неиспользуемые улики
-                this.allClues.forEach((clue) => {
-                    const isClueUsed = this.ghostsData.some((ghost) =>
-                        ghost.clues.includes(clue)
-                    );
-                    if (!isClueUsed) {
-                        console.warn(
-                            `Внимание: Улика "${clue}" присутствует в allClues, но не используется ни одним призраком. Возможно, опечатка.`
-                        );
-                    }
-                });
+              let hiddenCluesCount = 0;
+              if (this.difficulty === "nightmare") hiddenCluesCount = 1;
+              if (this.difficulty === "insanity") hiddenCluesCount = 2;
+              const maxPossibleClues = ghost.clues.length - hiddenCluesCount;
 
-                // Проверка, что guaranteedClue присутствует в clues призрака
-                this.ghostsData.forEach((ghost) => {
-                    if (
-                        ghost.guaranteedClue &&
-                        !ghost.clues.includes(ghost.guaranteedClue)
-                    ) {
-                        console.warn(
-                            `Внимание: Для призрака "${ghost.name}" указана гарантированная улика "${ghost.guaranteedClue}", но она отсутствует в его основном списке улик.`
-                        );
-                    }
-                });
+              if (this.foundClues.length > maxPossibleClues) {
+                return false;
+              }
 
-                this.allClues.forEach((clue) => {
-                    this.clueStates[clue] = null;
-                });
-            },
-            computed: {
-                foundClues() {
-                    return Object.keys(this.clueStates).filter(
-                        (clue) => this.clueStates[clue] === "found"
-                    );
-                },
-                excludedClues() {
-                    return Object.keys(this.clueStates).filter(
-                        (clue) => this.clueStates[clue] === "excluded"
-                    );
-                },
-                possibleGhosts() {
-                    return this.ghostsData.filter((ghost) => {
-                        if (ghost.guaranteedClue && this.excludedClues.includes(ghost.guaranteedClue)) {
-                            return false;
-                        }
+              if (
+                ghost.guaranteedClue &&
+                this.foundClues.length >= maxPossibleClues &&
+                !this.foundClues.includes(ghost.guaranteedClue)
+              ) {
+                return false;
+              }
 
-                        let foundMatchCount = 0;
-                        let excludedMatchCount = 0;
+              return (
+                excludedMatchCount <= hiddenCluesCount &&
+                foundMatchCount === this.foundClues.length
+              );
+            });
+          },
+        },
+        watch: {
+          showAllGhosts(newValue) {
+            localStorage.setItem(
+              "phasmaHelperShowAllGhosts",
+              JSON.stringify(newValue)
+            );
+          },
+          difficulty(newDifficulty) {
+            localStorage.setItem("phasmaHelperDifficulty", newDifficulty);
+          },
+        },
+        methods: {
+          confirmClue(clue) {
+            this.clueStates[clue] = "found";
+          },
+          clearClue(clue) {
+            this.clueStates[clue] = null;
+          },
+          excludeClue(clue) {
+            this.clueStates[clue] = "excluded";
+          },
+          resetAllClues() {
+            Object.keys(this.clueStates).forEach((clue) => {
+              this.clueStates[clue] = null;
+            });
+          },
+          isClueRelevant(clue) {
+            if (
+              this.clueStates[clue] === "found" ||
+              this.clueStates[clue] === "excluded"
+            ) {
+              return true;
+            }
 
-                        for (const clue of ghost.clues) {
-                            if (this.foundClues.includes(clue)) {
-                                foundMatchCount++;
-                            }
-                            if (this.excludedClues.includes(clue)) {
-                                excludedMatchCount++;
-                            }
-                        }
+            return this.ghostsData.some((ghost) => {
+              const matchesFound = ghost.clues.filter((c) =>
+                this.foundClues.includes(c)
+              ).length;
+              const matchesExcluded = ghost.clues.filter((c) =>
+                this.excludedClues.includes(c)
+              ).length;
+              const hasClue = ghost.clues.includes(clue);
+              let HiddenClues = 0;
+              if (this.difficulty === "nightmare") HiddenClues = 1;
+              if (this.difficulty === "insanity") HiddenClues = 2;
+              let guaranteedCluePresent = true;
 
-                        let hiddenCluesCount = 0;
-                        if (this.difficulty === "nightmare") hiddenCluesCount = 1;
-                        if (this.difficulty === "insanity") hiddenCluesCount = 2;
-                        const maxPossibleClues = ghost.clues.length - hiddenCluesCount;
+              if (
+                ghost.guaranteedClue &&
+                this.excludedClues.includes(ghost.guaranteedClue)
+              ) {
+                guaranteedCluePresent = false;
+              }
 
-                        if (this.foundClues.length > maxPossibleClues) {
-                            return false;
-                        }
+              if (this.foundClues.length >= ghost.clues.length - HiddenClues) {
+                guaranteedCluePresent = false;
+              }
 
-                        if (
-                            ghost.guaranteedClue &&
-                            this.foundClues.length >= maxPossibleClues &&
-                            !this.foundClues.includes(ghost.guaranteedClue)
-                        ) {
-                            return false;
-                        }
+              if (
+                ghost.guaranteedClue &&
+                this.foundClues.length >= ghost.clues.length - HiddenClues &&
+                !this.foundClues.includes(ghost.guaranteedClue)
+              ) {
+                guaranteedCluePresent = false;
+              }
 
-                        return (
-                            excludedMatchCount <= hiddenCluesCount &&
-                            foundMatchCount === this.foundClues.length
-                        );
-                    });
-                },
-            },
-            watch: {
-                showAllGhosts(newValue) {
-                    localStorage.setItem('phasmaHelperShowAllGhosts', JSON.stringify(newValue));
-                },
-                difficulty(newDifficulty) {
-                    localStorage.setItem('phasmaHelperDifficulty', newDifficulty);
-                }
-            },
-            methods: {
-                confirmClue(clue) {
-                    this.clueStates[clue] = "found";
-                },
-                clearClue(clue) {
-                    this.clueStates[clue] = null;
-                },
-                excludeClue(clue) {
-                    this.clueStates[clue] = "excluded";
-                },
-                isClueRelevant(clue) {
-                    if (
-                        this.clueStates[clue] === "found" ||
-                        this.clueStates[clue] === "excluded"
-                    ) {
-                        return true;
-                    }
-
-                    return this.ghostsData.some((ghost) => {
-                        const matchesFound = ghost.clues.filter((c) =>
-                            this.foundClues.includes(c)
-                        ).length;
-                        const matchesExcluded = ghost.clues.filter((c) =>
-                            this.excludedClues.includes(c)
-                        ).length;
-                        const hasClue = ghost.clues.includes(clue);
-                        let HiddenClues = 0;
-                        if (this.difficulty === "nightmare") HiddenClues = 1;
-                        if (this.difficulty === "insanity") HiddenClues = 2;
-                        let guaranteedCluePresent = true;
-
-                        if (
-                            ghost.guaranteedClue &&
-                            this.excludedClues.includes(ghost.guaranteedClue)
-                        ) {
-                            guaranteedCluePresent = false;
-                        }
-
-                        if (this.foundClues.length >= ghost.clues.length - HiddenClues) {
-                            guaranteedCluePresent = false;
-                        }
-
-                        if (ghost.guaranteedClue &&
-                            this.foundClues.length >= (ghost.clues.length - HiddenClues) &&
-                            !this.foundClues.includes(ghost.guaranteedClue)) {
-                            guaranteedCluePresent = false;
-                        }
-
-                        return (
-                            guaranteedCluePresent &&
-                            hasClue &&
-                            matchesExcluded <= HiddenClues &&
-                            matchesFound === this.foundClues.length
-                        );
-                    });
-                },
-            },
-        }).mount("#app");
-        </script>
-    </body>
+              return (
+                guaranteedCluePresent &&
+                hasClue &&
+                matchesExcluded <= HiddenClues &&
+                matchesFound === this.foundClues.length
+              );
+            });
+          },
+          resetAllClues() {
+            this.allClues.forEach((clue) => {
+              this.clueStates[clue] = null;
+            });
+          },
+        },
+      }).mount("#app");
+    </script>
+  </body>
 </html>
