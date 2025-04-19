@@ -4,7 +4,7 @@
   "description": "Phasmophobia Helper - A Vue.js application to identify ghosts based on clues.",
   "main": "phasma.html",
   "scripts": {
-    "build": "html-minifier-terser --collapse-whitespace --remove-comments --remove-optional-tags --remove-redundant-attributes --remove-script-type-attributes --remove-tag-whitespace --use-short-doctype --minify-css true --minify-js true phasma.html -o build/phasma2.html"
+    "build": "html-minifier-terser --collapse-whitespace --remove-comments --remove-optional-tags --remove-redundant-attributes --remove-script-type-attributes --remove-tag-whitespace --use-short-doctype --minify-css true --minify-js true phasma.html -o build/phasma.html"
   },
   "keywords": [
     "Phasmophobia",
