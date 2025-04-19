@@ -1,6 +1,6 @@
 {
   "name": "phasmaphobia-helper",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "Phasmophobia Helper - A Vue.js application to identify ghosts based on clues.",
   "main": "phasma.html",
   "scripts": {
