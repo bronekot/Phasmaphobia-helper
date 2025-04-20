@@ -105,8 +105,6 @@
         position: absolute;
         z-index: 1;
         bottom: 125%;
-        /* left: 50%; */
-        /* margin-left: -40px; */
         opacity: 0;
         transition: opacity 0.3s;
         font-size: 0.8em;
@@ -133,6 +131,17 @@
         color: #777;
       }
 
+      .clue-item.highlighted-by-ghost {
+        border: 2px solid #ffd700;
+        box-sizing: border-box;
+        margin: -1px;
+      }
+
+      .clue-item.found.highlighted-by-ghost,
+      .clue-item.excluded.highlighted-by-ghost {
+        border: 2px solid #ffd700;
+      }
+
       #possible-ghosts {
         margin-top: 20px;
         padding: 20px;
@@ -156,10 +165,18 @@
       #possible-ghosts li {
         padding: 8px 0;
         font-size: 1.1em;
+        cursor: pointer;
+        transition: color 0.2s ease, font-weight 2.8s ease;
       }
 
       #possible-ghosts li.inactive {
         color: #777;
+        cursor: default;
+      }
+
+      #possible-ghosts li.ghost-highlighted {
+        color: #ffd700;
+        font-weight: bold;
       }
 
       .difficulty-buttons {
@@ -316,7 +333,6 @@
 
       .reset-all-btn .tooltip {
         visibility: hidden;
-        /* width: 100px; */
         background-color: #333;
         color: #fff;
         text-align: center;
@@ -325,8 +341,6 @@
         position: absolute;
         z-index: 1;
         bottom: 125%;
-        /* left: 50%; */
-        /* margin-left: -50px; */
         opacity: 0;
         transition: opacity 0.3s;
         font-size: 0.8em;
@@ -342,7 +356,7 @@
         .container {
           width: 95%;
           padding: 15px;
-        } 
+        }
 
         .clue-item {
           padding: 6px 8px;
@@ -351,7 +365,6 @@
         h1 {
           display: none;
         }
-        /* скрыть h2 */
         h2 {
           display: none;
         }
@@ -394,7 +407,7 @@
         .container {
           width: 95%;
           padding: 0px;
-        } 
+        }
 
         #possible-ghosts {
           padding: 10px;
@@ -542,7 +555,12 @@
           v-for="clue in allClues"
           :key="clue"
           class="clue-item"
-          :class="{ found: clueStates[clue] === 'found', excluded: clueStates[clue] === 'excluded', inactive: !isClueRelevant(clue) && clueStates[clue] !== 'found' && clueStates[clue] !== 'excluded' }"
+          :class="{
+              found: clueStates[clue] === 'found',
+              excluded: clueStates[clue] === 'excluded',
+              inactive: !isClueRelevant(clue) && clueStates[clue] !== 'found' && clueStates[clue] !== 'excluded',
+              'highlighted-by-ghost': isClueHighlighted(clue)
+          }"
         >
           <span>{{ clue }}</span>
           <div class="clue-buttons">
@@ -576,7 +594,11 @@
           <li
             v-for="ghost in showAllGhosts ? ghostsData : possibleGhosts"
             :key="ghost.name"
-            :class="{ inactive: showAllGhosts && possibleGhosts.indexOf(ghost) === -1 }"
+            :class="{
+                inactive: showAllGhosts && !possibleGhosts.some(pg => pg.name === ghost.name),
+                'ghost-highlighted': highlightedGhost && highlightedGhost.name === ghost.name
+            }"
+            @click="toggleHighlightGhost(ghost)"
           >
             {{ ghost.name }}
           </li>
@@ -850,7 +872,8 @@
               },
             ],
             clueStates: {},
-            showAllGhosts: false,
+            showAllClues: false,
+            highlightedGhost: null,
           };
         },
         created() {
@@ -1007,6 +1030,34 @@
             Object.keys(this.clueStates).forEach((clue) => {
               this.clueStates[clue] = null;
             });
+            this.highlightedGhost = null;
+          },
+          toggleHighlightGhost(ghost) {
+            if (
+              this.showAllGhosts &&
+              !this.possibleGhosts.some((pg) => pg.name === ghost.name)
+            ) {
+              return;
+            }
+            if (
+              this.highlightedGhost &&
+              this.highlightedGhost.name === ghost.name
+            ) {
+              this.highlightedGhost = null;
+            } else {
+              const originalGhost = this.ghostsData.find(
+                (g) => g.name === ghost.name
+              );
+              if (originalGhost) {
+                this.highlightedGhost = originalGhost;
+              }
+            }
+          },
+          isClueHighlighted(clue) {
+            return (
+              this.highlightedGhost &&
+              this.highlightedGhost.clues.includes(clue)
+            );
           },
           isClueRelevant(clue) {
             if (
@@ -1054,11 +1105,6 @@
                 matchesExcluded <= HiddenClues &&
                 matchesFound === this.foundClues.length
               );
-            });
-          },
-          resetAllClues() {
-            this.allClues.forEach((clue) => {
-              this.clueStates[clue] = null;
             });
           },
         },
