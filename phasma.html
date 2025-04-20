@@ -132,14 +132,7 @@
       }
 
       .clue-item.highlighted-by-ghost {
-        border: 2px solid #ffd700;
-        box-sizing: border-box;
-        margin: -1px;
-      }
-
-      .clue-item.found.highlighted-by-ghost,
-      .clue-item.excluded.highlighted-by-ghost {
-        border: 2px solid #ffd700;
+        outline: 2px solid #ffd700;
       }
 
       #possible-ghosts {
@@ -166,7 +159,7 @@
         padding: 8px 0;
         font-size: 1.1em;
         cursor: pointer;
-        transition: color 0.2s ease, font-weight 2.8s ease;
+        transition: color 0.2s ease, font-weight 0.2s ease; /* Уменьшено время анимации */
       }
 
       #possible-ghosts li.inactive {
@@ -590,7 +583,10 @@
       </div>
       <div id="possible-ghosts">
         <h2>Возможные призраки</h2>
-        <ul v-if="showAllGhosts || possibleGhosts.length > 0">
+        <ul
+          v-if="showAllGhosts || possibleGhosts.length > 0"
+          :key="showAllGhosts"
+        >
           <li
             v-for="ghost in showAllGhosts ? ghostsData : possibleGhosts"
             :key="ghost.name"
@@ -1011,6 +1007,8 @@
               "phasmaHelperShowAllGhosts",
               JSON.stringify(newValue)
             );
+            this.highlightedGhost = null;
+            this.$forceUpdate();
           },
           difficulty(newDifficulty) {
             localStorage.setItem("phasmaHelperDifficulty", newDifficulty);
