@@ -583,16 +583,13 @@
       </div>
       <div id="possible-ghosts">
         <h2>Возможные призраки</h2>
-        <ul
-          v-if="showAllGhosts || possibleGhosts.length > 0"
-          :key="showAllGhosts"
-        >
+        <ul v-if="showAllGhosts || possibleGhosts.length > 0">
           <li
             v-for="ghost in showAllGhosts ? ghostsData : possibleGhosts"
-            :key="ghost.name"
+            :key="ghost.name + (showAllGhosts ? '-all' : '-filtered')"
             :class="{
-                inactive: showAllGhosts && !possibleGhosts.some(pg => pg.name === ghost.name),
-                'ghost-highlighted': highlightedGhost && highlightedGhost.name === ghost.name
+              inactive: showAllGhosts && possibleGhosts.indexOf(ghost) === -1,
+              'ghost-highlighted': highlightedGhost && highlightedGhost.name === ghost.name
             }"
             @click="toggleHighlightGhost(ghost)"
           >
@@ -868,7 +865,7 @@
               },
             ],
             clueStates: {},
-            showAllClues: false,
+            showAllGhosts: false,
             highlightedGhost: null,
           };
         },
