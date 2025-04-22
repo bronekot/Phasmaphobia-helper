@@ -636,7 +636,7 @@
                   "Радиоприёмник",
                   "След на соли",
                 ],
-                guaranteedClue: "След на соли",
+                guaranteedClue: ["След на соли"],
               },
               {
                 name: "Мираж",
@@ -650,7 +650,7 @@
                   "Лазерный проектор",
                   "След на соли",
                 ],
-                guaranteedClue: "След на соли",
+                guaranteedClue: ["След на соли"],
               },
               {
                 name: "Полтергейст",
@@ -660,7 +660,7 @@
                   "Радиоприёмник",
                   "След на соли",
                 ],
-                guaranteedClue: "След на соли",
+                guaranteedClue: ["След на соли"],
               },
               {
                 name: "Банши",
@@ -670,7 +670,7 @@
                   "Лазерный проектор",
                   "След на соли",
                 ],
-                guaranteedClue: "След на соли",
+                guaranteedClue: ["След на соли"],
               },
               {
                 name: "Джинн",
@@ -680,7 +680,7 @@
                   "Минусовая температура",
                   "След на соли",
                 ],
-                guaranteedClue: "След на соли",
+                guaranteedClue: ["След на соли"],
               },
               {
                 name: "Мара",
@@ -690,7 +690,7 @@
                   "Призрачный огонёк",
                   "След на соли",
                 ],
-                guaranteedClue: "След на соли",
+                guaranteedClue: ["След на соли"],
               },
               {
                 name: "Ревенант",
@@ -700,7 +700,7 @@
                   "Призрачный огонёк",
                   "След на соли",
                 ],
-                guaranteedClue: "След на соли",
+                guaranteedClue: ["След на соли"],
               },
               {
                 name: "Тень",
@@ -710,7 +710,7 @@
                   "Минусовая температура",
                   "След на соли",
                 ],
-                guaranteedClue: "След на соли",
+                guaranteedClue: ["След на соли"],
               },
               {
                 name: "Демон",
@@ -720,7 +720,7 @@
                   "Минусовая температура",
                   "След на соли",
                 ],
-                guaranteedClue: "След на соли",
+                guaranteedClue: ["След на соли"],
               },
               {
                 name: "Юрей",
@@ -730,7 +730,7 @@
                   "Лазерный проектор",
                   "След на соли",
                 ],
-                guaranteedClue: "След на соли",
+                guaranteedClue: ["След на соли"],
               },
               {
                 name: "Они",
@@ -740,7 +740,7 @@
                   "Лазерный проектор",
                   "След на соли",
                 ],
-                guaranteedClue: "След на соли",
+                guaranteedClue: ["След на соли"],
               },
               {
                 name: "Ёкай",
@@ -750,7 +750,7 @@
                   "Лазерный проектор",
                   "След на соли",
                 ],
-                guaranteedClue: "След на соли",
+                guaranteedClue: ["След на соли"],
               },
               {
                 name: "Ханту",
@@ -780,7 +780,7 @@
                   "Ультрафиолет",
                   "След на соли",
                 ],
-                guaranteedClue: "След на соли",
+                guaranteedClue: ["След на соли"],
               },
               {
                 name: "Онрё",
@@ -790,7 +790,7 @@
                   "Призрачный огонёк",
                   "След на соли",
                 ],
-                guaranteedClue: "След на соли",
+                guaranteedClue: ["След на соли"],
               },
               {
                 name: "Близнецы",
@@ -800,7 +800,7 @@
                   "Радиоприёмник",
                   "След на соли",
                 ],
-                guaranteedClue: "След на соли",
+                guaranteedClue: ["След на соли"],
               },
               {
                 name: "Райдзю",
@@ -810,7 +810,7 @@
                   "Лазерный проектор",
                   "След на соли",
                 ],
-                guaranteedClue: "След на соли",
+                guaranteedClue: ["След на соли"],
               },
               {
                 name: "Обакэ",
@@ -861,7 +861,7 @@
                   "Лазерный проектор",
                   "След на соли",
                 ],
-                guaranteedClue: "След на соли",
+                guaranteedClue: ["След на соли"],
               },
             ],
             clueStates: {},
@@ -895,30 +895,6 @@
             }
           }
 
-          // Проверка на неиспользуемые улики
-          this.allClues.forEach((clue) => {
-            const isClueUsed = this.ghostsData.some((ghost) =>
-              ghost.clues.includes(clue)
-            );
-            if (!isClueUsed) {
-              console.warn(
-                `Внимание: Улика "${clue}" присутствует в allClues, но не используется ни одним призраком. Возможно, опечатка.`
-              );
-            }
-          });
-
-          // Проверка, что guaranteedClue присутствует в clues призрака
-          this.ghostsData.forEach((ghost) => {
-            if (
-              ghost.guaranteedClue &&
-              !ghost.clues.includes(ghost.guaranteedClue)
-            ) {
-              console.warn(
-                `Внимание: Для призрака "${ghost.name}" указана гарантированная улика "${ghost.guaranteedClue}", но она отсутствует в его основном списке улик.`
-              );
-            }
-          });
-
           this.allClues.forEach((clue) => {
             this.clueStates[clue] = null;
           });
@@ -937,6 +913,7 @@
           possibleGhosts() {
             return this.ghostsData.filter((ghost) => {
               if (
+                ghost.guaranteedClue &&
                 ghost.guaranteedClue.some((clue) =>
                   this.excludedClues.includes(clue)
                 )
@@ -967,20 +944,15 @@
 
               if (
                 ghost.guaranteedClue &&
-                this.foundClues.length >= maxPossibleClues &&
-                !this.foundClues.includes(ghost.guaranteedClue)
+                this.foundClues.length >= maxPossibleClues
               ) {
-                return false;
-              }
-
-              if (
-                Array.isArray(ghost.guaranteedClue) &&
-                this.foundClues.length >= maxPossibleClues &&
-                !ghost.guaranteedClue.every((clue) =>
-                  this.foundClues.includes(clue)
-                )
-              ) {
-                return false;
+                if (
+                  !ghost.guaranteedClue.every((clue) =>
+                    this.foundClues.includes(clue)
+                  )
+                ) {
+                  return false;
+                }
               }
 
               return (
@@ -1054,44 +1026,49 @@
               return true;
             }
 
-            return this.ghostsData.some((ghost) => {
-              const matchesFound = ghost.clues.filter((c) =>
-                this.foundClues.includes(c)
-              ).length;
-              const matchesExcluded = ghost.clues.filter((c) =>
-                this.excludedClues.includes(c)
-              ).length;
-              const hasClue = ghost.clues.includes(clue);
-              let HiddenClues = 0;
-              if (this.difficulty === "nightmare") HiddenClues = 1;
-              if (this.difficulty === "insanity") HiddenClues = 2;
-              let guaranteedCluePresent = true;
+            const possibleGhosts = this.possibleGhosts;
+            const foundClues = this.foundClues;
+            const difficulty = this.difficulty;
 
-              if (
-                ghost.guaranteedClue &&
-                this.excludedClues.includes(ghost.guaranteedClue)
-              ) {
-                guaranteedCluePresent = false;
+            if (possibleGhosts.length === 0) {
+              return false;
+            }
+
+            return possibleGhosts.some((ghost) => {
+              if (!ghost.clues.includes(clue)) {
+                return false;
               }
 
-              if (this.foundClues.length >= ghost.clues.length - HiddenClues) {
-                guaranteedCluePresent = false;
+              let hiddenCluesCount = 0;
+              if (difficulty === "nightmare") hiddenCluesCount = 1;
+              if (difficulty === "insanity") hiddenCluesCount = 2;
+
+              const maxPossibleClues = Math.max(0, ghost.clues.length - hiddenCluesCount);
+              const foundCluesCount = foundClues.length;
+
+
+              if (foundCluesCount >= maxPossibleClues) {
+                return false;
               }
 
-              if (
-                ghost.guaranteedClue &&
-                this.foundClues.length >= ghost.clues.length - HiddenClues &&
-                !this.foundClues.includes(ghost.guaranteedClue)
-              ) {
-                guaranteedCluePresent = false;
-              }
+              const hasGuaranteed = (difficulty === "nightmare" || difficulty === "insanity") && ghost.guaranteedClue && ghost.guaranteedClue.length > 0;
 
-              return (
-                guaranteedCluePresent &&
-                hasClue &&
-                matchesExcluded <= HiddenClues &&
-                matchesFound === this.foundClues.length
-              );
+              if (hasGuaranteed) {
+                  const guaranteed = ghost.guaranteedClue;
+                  const foundGuaranteed = guaranteed.filter(gc => foundClues.includes(gc));
+                  const remainingGuaranteedNeeded = guaranteed.length - foundGuaranteed.length;
+                  const remainingSlots = maxPossibleClues - foundCluesCount;
+
+                  if (remainingGuaranteedNeeded > remainingSlots) {
+                      return false;
+                  }
+
+                  if (remainingSlots === remainingGuaranteedNeeded && remainingGuaranteedNeeded > 0) {
+                      const isClueOneOfTheNeededGuaranteed = guaranteed.includes(clue) && !foundClues.includes(clue);
+                      return isClueOneOfTheNeededGuaranteed;
+                  }
+              }
+              return true;
             });
           },
         },
