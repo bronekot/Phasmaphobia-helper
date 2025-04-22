@@ -1043,30 +1043,42 @@
               if (difficulty === "nightmare") hiddenCluesCount = 1;
               if (difficulty === "insanity") hiddenCluesCount = 2;
 
-              const maxPossibleClues = Math.max(0, ghost.clues.length - hiddenCluesCount);
+              const maxPossibleClues = Math.max(
+                0,
+                ghost.clues.length - hiddenCluesCount
+              );
               const foundCluesCount = foundClues.length;
-
 
               if (foundCluesCount >= maxPossibleClues) {
                 return false;
               }
 
-              const hasGuaranteed = (difficulty === "nightmare" || difficulty === "insanity") && ghost.guaranteedClue && ghost.guaranteedClue.length > 0;
+              const hasGuaranteed =
+                (difficulty === "nightmare" || difficulty === "insanity") &&
+                ghost.guaranteedClue &&
+                ghost.guaranteedClue.length > 0;
 
               if (hasGuaranteed) {
-                  const guaranteed = ghost.guaranteedClue;
-                  const foundGuaranteed = guaranteed.filter(gc => foundClues.includes(gc));
-                  const remainingGuaranteedNeeded = guaranteed.length - foundGuaranteed.length;
-                  const remainingSlots = maxPossibleClues - foundCluesCount;
+                const guaranteed = ghost.guaranteedClue;
+                const foundGuaranteed = guaranteed.filter((gc) =>
+                  foundClues.includes(gc)
+                );
+                const remainingGuaranteedNeeded =
+                  guaranteed.length - foundGuaranteed.length;
+                const remainingSlots = maxPossibleClues - foundCluesCount;
 
-                  if (remainingGuaranteedNeeded > remainingSlots) {
-                      return false;
-                  }
+                if (remainingGuaranteedNeeded > remainingSlots) {
+                  return false;
+                }
 
-                  if (remainingSlots === remainingGuaranteedNeeded && remainingGuaranteedNeeded > 0) {
-                      const isClueOneOfTheNeededGuaranteed = guaranteed.includes(clue) && !foundClues.includes(clue);
-                      return isClueOneOfTheNeededGuaranteed;
-                  }
+                if (
+                  remainingSlots === remainingGuaranteedNeeded &&
+                  remainingGuaranteedNeeded > 0
+                ) {
+                  const isClueOneOfTheNeededGuaranteed =
+                    guaranteed.includes(clue) && !foundClues.includes(clue);
+                  return isClueOneOfTheNeededGuaranteed;
+                }
               }
               return true;
             });
