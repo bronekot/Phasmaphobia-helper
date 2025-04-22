@@ -911,55 +911,11 @@
             );
           },
           possibleGhosts() {
-            return this.ghostsData.filter((ghost) => {
-              if (
-                ghost.guaranteedClue &&
-                ghost.guaranteedClue.some((clue) =>
-                  this.excludedClues.includes(clue)
-                )
-              ) {
-                return false;
-              }
-
-              let foundMatchCount = 0;
-              let excludedMatchCount = 0;
-
-              for (const clue of ghost.clues) {
-                if (this.foundClues.includes(clue)) {
-                  foundMatchCount++;
-                }
-                if (this.excludedClues.includes(clue)) {
-                  excludedMatchCount++;
-                }
-              }
-
-              let hiddenCluesCount = 0;
-              if (this.difficulty === "nightmare") hiddenCluesCount = 1;
-              if (this.difficulty === "insanity") hiddenCluesCount = 2;
-              const maxPossibleClues = ghost.clues.length - hiddenCluesCount;
-
-              if (this.foundClues.length > maxPossibleClues) {
-                return false;
-              }
-
-              if (
-                ghost.guaranteedClue &&
-                this.foundClues.length >= maxPossibleClues
-              ) {
-                if (
-                  !ghost.guaranteedClue.every((clue) =>
-                    this.foundClues.includes(clue)
-                  )
-                ) {
-                  return false;
-                }
-              }
-
-              return (
-                excludedMatchCount <= hiddenCluesCount &&
-                foundMatchCount === this.foundClues.length
-              );
-            });
+            return this.getPossibleGhosts(
+              this.foundClues,
+              this.excludedClues,
+              this.difficulty
+            );
           },
         },
         watch: {
@@ -976,6 +932,69 @@
           },
         },
         methods: {
+          getPossibleGhosts(foundClues, excludedClues, difficulty) {
+            return this.ghostsData.filter((ghost) => {
+              if (
+                ghost.guaranteedClue &&
+                ghost.guaranteedClue.some((clue) =>
+                  excludedClues.includes(clue)
+                )
+              ) {
+                return false;
+              }
+              if (!foundClues.every((fc) => ghost.clues.includes(fc))) {
+                return false;
+              }
+              let hiddenCluesCount = 0;
+              if (difficulty === "nightmare") hiddenCluesCount = 1;
+              if (difficulty === "insanity") hiddenCluesCount = 2;
+              const maxPossibleClues = Math.max(
+                0,
+                ghost.clues.length - hiddenCluesCount
+              );
+              if (foundClues.length > maxPossibleClues) {
+                return false;
+              }
+              let excludedMatchCount = 0;
+              for (const ec of excludedClues) {
+                if (ghost.clues.includes(ec)) {
+                  excludedMatchCount++;
+                }
+              }
+              if (excludedMatchCount > hiddenCluesCount) {
+                return false;
+              }
+              if (
+                ghost.guaranteedClue &&
+                foundClues.length >= maxPossibleClues
+              ) {
+                if (
+                  !ghost.guaranteedClue.every((clue) =>
+                    foundClues.includes(clue)
+                  )
+                ) {
+                  return false;
+                }
+              }
+              const hasGuaranteed =
+                (difficulty === "nightmare" || difficulty === "insanity") &&
+                ghost.guaranteedClue &&
+                ghost.guaranteedClue.length > 0;
+              if (hasGuaranteed) {
+                const guaranteed = ghost.guaranteedClue;
+                const foundGuaranteedCount = guaranteed.filter((gc) =>
+                  foundClues.includes(gc)
+                ).length;
+                const remainingGuaranteedNeeded =
+                  guaranteed.length - foundGuaranteedCount;
+                const remainingSlots = maxPossibleClues - foundClues.length;
+                if (remainingGuaranteedNeeded > remainingSlots) {
+                  return false;
+                }
+              }
+              return true;
+            });
+          },
           confirmClue(clue) {
             this.clueStates[clue] = "found";
           },
@@ -1026,62 +1045,24 @@
               return true;
             }
 
-            const possibleGhosts = this.possibleGhosts;
-            const foundClues = this.foundClues;
-            const difficulty = this.difficulty;
-
-            if (possibleGhosts.length === 0) {
+            const currentPossibleGhosts = this.possibleGhosts;
+            const currentFoundClues = this.foundClues;
+            const currentExcludedClues = this.excludedClues;
+            const currentDifficulty = this.difficulty;
+            if (currentPossibleGhosts.length <= 1) {
               return false;
             }
-
-            return possibleGhosts.some((ghost) => {
-              if (!ghost.clues.includes(clue)) {
-                return false;
-              }
-
-              let hiddenCluesCount = 0;
-              if (difficulty === "nightmare") hiddenCluesCount = 1;
-              if (difficulty === "insanity") hiddenCluesCount = 2;
-
-              const maxPossibleClues = Math.max(
-                0,
-                ghost.clues.length - hiddenCluesCount
-              );
-              const foundCluesCount = foundClues.length;
-
-              if (foundCluesCount >= maxPossibleClues) {
-                return false;
-              }
-
-              const hasGuaranteed =
-                (difficulty === "nightmare" || difficulty === "insanity") &&
-                ghost.guaranteedClue &&
-                ghost.guaranteedClue.length > 0;
-
-              if (hasGuaranteed) {
-                const guaranteed = ghost.guaranteedClue;
-                const foundGuaranteed = guaranteed.filter((gc) =>
-                  foundClues.includes(gc)
-                );
-                const remainingGuaranteedNeeded =
-                  guaranteed.length - foundGuaranteed.length;
-                const remainingSlots = maxPossibleClues - foundCluesCount;
-
-                if (remainingGuaranteedNeeded > remainingSlots) {
-                  return false;
-                }
-
-                if (
-                  remainingSlots === remainingGuaranteedNeeded &&
-                  remainingGuaranteedNeeded > 0
-                ) {
-                  const isClueOneOfTheNeededGuaranteed =
-                    guaranteed.includes(clue) && !foundClues.includes(clue);
-                  return isClueOneOfTheNeededGuaranteed;
-                }
-              }
-              return true;
-            });
+            const hypotheticalFoundClues = [...currentFoundClues, clue];
+            const hypotheticalPossibleGhosts = this.getPossibleGhosts(
+              hypotheticalFoundClues,
+              currentExcludedClues, // Исключенные не меняются
+              currentDifficulty
+            );
+            return (
+              hypotheticalPossibleGhosts.length <
+                currentPossibleGhosts.length &&
+              hypotheticalPossibleGhosts.length > 0
+            );
           },
         },
       }).mount("#app");
