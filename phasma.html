@@ -937,14 +937,6 @@
           possibleGhosts() {
             return this.ghostsData.filter((ghost) => {
               if (
-                ghost.guaranteedClue &&
-                this.excludedClues.includes(ghost.guaranteedClue)
-              ) {
-                return false;
-              }
-
-              if (
-                Array.isArray(ghost.guaranteedClue) &&
                 ghost.guaranteedClue.some((clue) =>
                   this.excludedClues.includes(clue)
                 )
