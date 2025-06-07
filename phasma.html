@@ -139,6 +139,12 @@
         outline: 2px solid #ffd700;
       }
 
+      .clue-item.secondary-clue {
+        border-left: 3px solid #4caf50;
+        padding-left: 15px;
+        background-color: rgba(76, 175, 80, 0.1);
+      }
+
       #possible-ghosts {
         margin-top: 20px;
         padding: 20px;
@@ -596,17 +602,26 @@
           </button>
         </div>
         <div
-          v-for="clue in allClues"
+          v-for="clue in allCluesComputed"
           :key="clue"
           class="clue-item"
           :class="{
               found: clueStates[clue] === 'found',
               excluded: clueStates[clue] === 'excluded',
               inactive: !isClueRelevant(clue) && clueStates[clue] !== 'found' && clueStates[clue] !== 'excluded',
-              'highlighted-by-ghost': isClueHighlighted(clue)
+              'highlighted-by-ghost': isClueHighlighted(clue),
+              'secondary-clue': secondaryClues.includes(clue)
           }"
         >
-          <span>{{ clue }}</span>
+          <span>
+            {{ clue }}
+            <small
+              v-if="secondaryClues.includes(clue)"
+              style="color: #aaa; font-style: italic"
+            >
+              (вторичная)
+            </small>
+          </span>
           <div class="clue-buttons">
             <button
               @click="confirmClue(clue)"
@@ -670,6 +685,17 @@
         </label>
         <span class="switch-label"
           >Показывать всех призраков (затенять отфильтрованных)</span
+        >
+      </div>
+
+      <!-- Переключатель для вторичных улик -->
+      <div class="switch-wrapper">
+        <label class="switch">
+          <input type="checkbox" v-model="enableSecondaryClues" />
+          <span class="slider"></span>
+        </label>
+        <span class="switch-label"
+          >Включить вторичные улики (дополнительные подсказки)</span
         >
       </div>
     </div>
@@ -977,9 +1003,76 @@
                   "Становится очень активным и быстрым (2.75 м/с) при первом приближении игрока. Чем больше времени игроки проводят рядом с ним, тем тише и медленнее (1 м/с) он становится, и его порог рассудка для начала охоты снижается.",
               },
             ],
+            // Вторичные улики
+            secondaryClues: [
+              "Лазерный проектор через видеокамеру",
+              "Морозный пар во время охоты",
+              "Уникальные отпечатки пальцев",
+              "Характерный крик в параболический микрофон",
+              "Уникальный ответ в радиоприёмник",
+              "Закрытие входной двери без проявления",
+              "Частые звуки в параболический микрофон",
+              "Отсутствие сгустков воздуха",
+              "Исчезновение при фотографировании",
+              "Смена поведения призрака",
+            ],
+            // Связи вторичных улик с основными
+            secondaryClueRelations: {
+              "Лазерный проектор через видеокамеру": {
+                triggerClue: "Лазерный проектор",
+                triggerState: "excluded",
+                ghostTypes: ["Горё"],
+              },
+              "Морозный пар во время охоты": {
+                triggerClue: "Минусовая температура",
+                triggerState: "found",
+                ghostTypes: ["Ханту"],
+              },
+              "Уникальные отпечатки пальцев": {
+                triggerClue: "Ультрафиолет",
+                triggerState: "found",
+                ghostTypes: ["Обакэ"],
+              },
+              "Характерный крик в параболический микрофон": {
+                triggerClue: null,
+                triggerState: null,
+                ghostTypes: ["Банши"],
+              },
+              "Уникальный ответ в радиоприёмник": {
+                triggerClue: "Радиоприёмник",
+                triggerState: "found",
+                ghostTypes: ["Деоген"],
+              },
+              "Закрытие входной двери без проявления": {
+                triggerClue: null,
+                triggerState: null,
+                ghostTypes: ["Юрей"],
+              },
+              "Частые звуки в параболический микрофон": {
+                triggerClue: null,
+                triggerState: null,
+                ghostTypes: ["Мюлинг"],
+              },
+              "Отсутствие сгустков воздуха": {
+                triggerClue: null,
+                triggerState: null,
+                ghostTypes: ["Они"],
+              },
+              "Исчезновение при фотографировании": {
+                triggerClue: null,
+                triggerState: null,
+                ghostTypes: ["Фантом"],
+              },
+              "Смена поведения призрака": {
+                triggerClue: null,
+                triggerState: null,
+                ghostTypes: ["Мимик"],
+              },
+            },
             clueStates: {},
             showAllGhosts: false,
             highlightedGhost: null,
+            enableSecondaryClues: false,
           };
         },
         created() {
@@ -988,6 +1081,13 @@
           );
           if (savedShowAllGhosts !== null) {
             this.showAllGhosts = JSON.parse(savedShowAllGhosts);
+          }
+
+          const savedSecondaryClues = localStorage.getItem(
+            "phasmaHelperSecondaryClues"
+          );
+          if (savedSecondaryClues !== null) {
+            this.enableSecondaryClues = JSON.parse(savedSecondaryClues);
           }
 
           const savedDifficulty = localStorage.getItem(
@@ -1008,11 +1108,50 @@
             }
           }
 
-          this.allClues.forEach((clue) => {
+          // Инициализируем состояния для всех улик
+          [...this.allClues, ...this.secondaryClues].forEach((clue) => {
             this.clueStates[clue] = null;
           });
         },
         computed: {
+          // Объединенный список всех улик
+          allCluesComputed() {
+            if (this.enableSecondaryClues) {
+              // Убедимся, что нет дубликатов, если availableSecondaryClues может вернуть уже существующие основные
+              const uniqueSecondary = this.availableSecondaryClues.filter(
+                (sc) => !this.allClues.includes(sc)
+              );
+              return [...this.allClues, ...uniqueSecondary];
+            }
+            return this.allClues;
+          },
+
+          // Доступные вторичные улики (те, которые должны быть показаны)
+          availableSecondaryClues() {
+            if (!this.enableSecondaryClues) return [];
+
+            return this.secondaryClues.filter((secondaryClue) => {
+              const relation = this.secondaryClueRelations[secondaryClue];
+              if (!relation) return false;
+
+              // Если эта secondaryClue уже имеет состояние (найдена/исключена), она должна быть показана.
+              if (this.clueStates[secondaryClue] !== null) {
+                return true;
+              }
+
+              // Если не установлена, проверяем условия триггера для ее появления как опции
+              if (relation.triggerClue && relation.triggerState) {
+                const currentTriggerState =
+                  this.clueStates[relation.triggerClue];
+                if (currentTriggerState !== relation.triggerState) {
+                  return false; // Триггер не выполнен
+                }
+              }
+              // Если триггер выполнен (или нет триггера), она доступна для установки.
+              return true;
+            });
+          },
+
           foundClues() {
             return Object.keys(this.clueStates).filter(
               (clue) => this.clueStates[clue] === "found"
@@ -1024,6 +1163,8 @@
             );
           },
           possibleGhosts() {
+            // Передаем все найденные и исключенные улики (включая вторичные)
+            // getPossibleGhosts будет разбираться, как их интерпретировать.
             return this.getPossibleGhosts(
               this.foundClues,
               this.excludedClues,
@@ -1040,71 +1181,198 @@
             this.highlightedGhost = null;
             this.$forceUpdate();
           },
+          enableSecondaryClues(newValue) {
+            localStorage.setItem(
+              "phasmaHelperSecondaryClues",
+              JSON.stringify(newValue)
+            );
+            // Сбрасываем состояния вторичных улик при отключении
+            if (!newValue) {
+              this.secondaryClues.forEach((clue) => {
+                this.clueStates[clue] = null;
+              });
+            }
+            this.$forceUpdate();
+          },
           difficulty(newDifficulty) {
             localStorage.setItem("phasmaHelperDifficulty", newDifficulty);
           },
+          // Добавляем отслеживание изменений состояний улик для обновления вторичных улик
+          clueStates: {
+            handler() {
+              this.$forceUpdate();
+            },
+            deep: true,
+          },
         },
         methods: {
-          getPossibleGhosts(foundClues, excludedClues, difficulty) {
+          getPossibleGhosts(
+            currentFoundCluesAll,
+            currentExcludedCluesAll,
+            difficulty
+          ) {
             return this.ghostsData.filter((ghost) => {
+              // 1. Определяем эффективный список исключенных улик для этого призрака
+              let dynamicExcludedClues = [...currentExcludedCluesAll];
+
+              // Особый случай для Горё: если его вторичная улика найдена,
+              // исключение "Лазерного проектора" не должно работать против него.
               if (
-                ghost.guaranteedClue &&
-                ghost.guaranteedClue.some((clue) =>
-                  excludedClues.includes(clue)
+                ghost.name === "Горё" &&
+                currentFoundCluesAll.includes(
+                  "Лазерный проектор через видеокамеру"
                 )
               ) {
-                return false;
+                dynamicExcludedClues = dynamicExcludedClues.filter(
+                  (clue) => clue !== "Лазерный проектор"
+                );
               }
-              if (!foundClues.every((fc) => ghost.clues.includes(fc))) {
-                return false;
+              // TODO: Добавить аналогичную логику для других призраков, если необходимо
+
+              // 2. Проверка на гарантированные ОСНОВНЫЕ улики в списке исключенных
+              // Если гарантированная ОСНОВНАЯ улика призрака эффективно исключена (и не переопределена вторичной), призрак невозможен.
+              if (ghost.guaranteedClue) {
+                for (const gc of ghost.guaranteedClue) {
+                  // Проверяем только основные улики из guaranteedClue
+                  if (
+                    this.allClues.includes(gc) &&
+                    dynamicExcludedClues.includes(gc)
+                  ) {
+                    // Проверяем, есть ли переопределение для этого конкретного gc (например, для Горё)
+                    let isOverriddenBySecondary = false;
+                    if (
+                      ghost.name === "Горё" &&
+                      gc === "Лазерный проектор" &&
+                      currentFoundCluesAll.includes(
+                        "Лазерный проектор через видеокамеру"
+                      )
+                    ) {
+                      isOverriddenBySecondary = true;
+                    }
+                    // TODO: Обобщить проверку переопределения для других вторичных улик, если они так работают
+
+                    if (!isOverriddenBySecondary) {
+                      return false; // Гарантированная основная улика исключена без переопределения
+                    }
+                  }
+                }
               }
+
+              // 3. Проверка совместимости со всеми НАЙДЕННЫМИ ОСНОВНЫМИ уликами
+              // Если найдена основная улика, которой нет у призрака, он невозможен.
+              for (const fc of currentFoundCluesAll) {
+                if (this.allClues.includes(fc) && !ghost.clues.includes(fc)) {
+                  return false;
+                }
+              }
+
+              // 4. Определяем набор эффективно найденных ОСНОВНЫХ типов улик для этого призрака
+              const effectivelyFoundPrimaryTypes = new Set();
+              for (const fc of currentFoundCluesAll) {
+                if (this.allClues.includes(fc)) {
+                  // fc - это основная улика
+                  if (ghost.clues.includes(fc)) {
+                    effectivelyFoundPrimaryTypes.add(fc);
+                  }
+                } else if (this.secondaryClues.includes(fc)) {
+                  // fc - это вторичная улика
+                  const relation = this.secondaryClueRelations[fc];
+                  if (relation && relation.ghostTypes.includes(ghost.name)) {
+                    // Если вторичная улика связана с основной уликой призрака (через triggerClue)
+                    // и эта основная улика есть у призрака, считаем эту основную улику "найденной"
+                    if (
+                      relation.triggerClue &&
+                      ghost.clues.includes(relation.triggerClue)
+                    ) {
+                      effectivelyFoundPrimaryTypes.add(relation.triggerClue);
+                    }
+                    // Вторичные улики без triggerClue (например, крик Банши) - это поведенческие,
+                    // они не заполняют "слот" основной улики, но подтверждают призрака.
+                    // Для текущей логики подсчета улик они не добавляются в effectivelyFoundPrimaryTypes,
+                    // но их нахождение (fc in currentFoundCluesAll) важно для общего соответствия.
+                  }
+                }
+              }
+
+              // 5. Проверка количества улик в зависимости от сложности
               let hiddenCluesCount = 0;
               if (difficulty === "nightmare") hiddenCluesCount = 1;
               if (difficulty === "insanity") hiddenCluesCount = 2;
-              const maxPossibleClues = Math.max(
+              // Максимальное количество ОСНОВНЫХ улик, которые можно найти для этого призрака на данной сложности
+              const maxPrimaryCluesToShow = Math.max(
                 0,
                 ghost.clues.length - hiddenCluesCount
               );
-              if (foundClues.length > maxPossibleClues) {
-                return false;
+
+              if (effectivelyFoundPrimaryTypes.size > maxPrimaryCluesToShow) {
+                return false; // Найдено больше основных типов улик, чем возможно
               }
-              let excludedMatchCount = 0;
-              for (const ec of excludedClues) {
-                if (ghost.clues.includes(ec)) {
-                  excludedMatchCount++;
+
+              // 6. Проверка исключенных ОСНОВНЫХ улик призрака с учетом скрытых улик
+              let excludedPrimaryClueMatchCount = 0;
+              for (const ec of dynamicExcludedClues) {
+                // Считаем только исключение ОСНОВНЫХ улик, которые есть у призрака
+                if (this.allClues.includes(ec) && ghost.clues.includes(ec)) {
+                  excludedPrimaryClueMatchCount++;
                 }
               }
-              if (excludedMatchCount > hiddenCluesCount) {
+              if (excludedPrimaryClueMatchCount > hiddenCluesCount) {
+                // Исключено больше основных улик призрака, чем может быть скрыто
                 return false;
               }
+
+              // 7. Финальная проверка гарантированных улик (на основе эффективно найденных типов)
+              // Если все возможные улики найдены, среди них должны быть все гарантированные.
               if (
                 ghost.guaranteedClue &&
-                foundClues.length >= maxPossibleClues
+                effectivelyFoundPrimaryTypes.size >= maxPrimaryCluesToShow
               ) {
                 if (
-                  !ghost.guaranteedClue.every((clue) =>
-                    foundClues.includes(clue)
+                  !ghost.guaranteedClue.every((gc) =>
+                    effectivelyFoundPrimaryTypes.has(gc)
                   )
                 ) {
                   return false;
                 }
               }
-              const hasGuaranteed =
+
+              // На сложностях "Кошмар" и "Безумие" нужно убедиться, что оставшиеся слоты под улики
+              // достаточны для нахождения всех оставшихся гарантированных улик.
+              const hasGuaranteedForDifficulty =
                 (difficulty === "nightmare" || difficulty === "insanity") &&
                 ghost.guaranteedClue &&
                 ghost.guaranteedClue.length > 0;
-              if (hasGuaranteed) {
+              if (hasGuaranteedForDifficulty) {
                 const guaranteed = ghost.guaranteedClue;
                 const foundGuaranteedCount = guaranteed.filter((gc) =>
-                  foundClues.includes(gc)
+                  effectivelyFoundPrimaryTypes.has(gc)
                 ).length;
                 const remainingGuaranteedNeeded =
                   guaranteed.length - foundGuaranteedCount;
-                const remainingSlots = maxPossibleClues - foundClues.length;
-                if (remainingGuaranteedNeeded > remainingSlots) {
+                const remainingSlotsForPrimaryClues =
+                  maxPrimaryCluesToShow - effectivelyFoundPrimaryTypes.size;
+
+                if (remainingGuaranteedNeeded > remainingSlotsForPrimaryClues) {
                   return false;
                 }
               }
+
+              // Дополнительная проверка для вторичных улик без triggerClue (поведенческих):
+              // Если такая улика найдена, но она не для этого призрака, то призрак невозможен.
+              for (const fc of currentFoundCluesAll) {
+                if (this.secondaryClues.includes(fc)) {
+                  const relation = this.secondaryClueRelations[fc];
+                  if (
+                    relation &&
+                    !relation.triggerClue &&
+                    !relation.ghostTypes.includes(ghost.name)
+                  ) {
+                    // Найдена "поведенческая" вторичная улика, которая не принадлежит этому призраку
+                    return false;
+                  }
+                }
+              }
+
               return true;
             });
           },
@@ -1151,6 +1419,14 @@
             );
           },
           isClueRelevant(clue) {
+            // Вторичные улики всегда считаются релевантными, если они доступны
+            if (
+              this.secondaryClues.includes(clue) &&
+              this.enableSecondaryClues
+            ) {
+              return this.availableSecondaryClues.includes(clue);
+            }
+
             if (
               this.clueStates[clue] === "found" ||
               this.clueStates[clue] === "excluded"
@@ -1159,18 +1435,25 @@
             }
 
             const currentPossibleGhosts = this.possibleGhosts;
-            const currentFoundClues = this.foundClues;
-            const currentExcludedClues = this.excludedClues;
+            const currentFoundClues = this.foundClues.filter(
+              (c) => !this.secondaryClues.includes(c)
+            );
+            const currentExcludedClues = this.excludedClues.filter(
+              (c) => !this.secondaryClues.includes(c)
+            );
             const currentDifficulty = this.difficulty;
+
             if (currentPossibleGhosts.length <= 1) {
               return false;
             }
+
             const hypotheticalFoundClues = [...currentFoundClues, clue];
             const hypotheticalPossibleGhosts = this.getPossibleGhosts(
               hypotheticalFoundClues,
               currentExcludedClues,
               currentDifficulty
             );
+
             return (
               hypotheticalPossibleGhosts.length <
                 currentPossibleGhosts.length &&
