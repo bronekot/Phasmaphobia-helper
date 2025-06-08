@@ -128,13 +128,13 @@ const clues = ref<Array<{ id: ClueId; label: string; status: ClueStatus }>>([
   transition: background-color 0.3s ease;
 
   @include breakpoint-xs {
-    width: 32px;
-    height: 32px;
+    width: 2rem;
+    height: 2rem;
   }
 
   @include breakpoint-sm {
-    width: 36px;
-    height: 36px;
+    width: 2.25rem;
+    height: 2.25rem;
   }
 
   &::before {

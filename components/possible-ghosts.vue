@@ -1,4 +1,6 @@
 <script setup lang="ts">
+const selectedGhost = ref<GhostId | null>(null);
+
 const ghosts = [
   { id: 'spirit', label: 'Дух' },
   { id: 'wraith', label: 'Мираж' },
@@ -35,8 +37,9 @@ const ghosts = [
         v-for="ghost in ghosts"
         :key="ghost.id"
         class="ghost-button"
+        @click="selectedGhost = selectedGhost !== ghost.id ? ghost.id : null"
       >
-        <span class="ghost-label">
+        <span :class="['ghost-label', { selected: selectedGhost === ghost.id }]">
           {{ ghost.label }}
         </span>
       </button>
@@ -86,8 +89,6 @@ const ghosts = [
 }
 
 .ghost-button {
-  cursor: pointer;
-
   display: flex;
   align-items: center;
   justify-content: center;
@@ -96,15 +97,29 @@ const ghosts = [
   border: unset;
 
   background-color: unset;
+
+  &:enabled {
+    cursor: pointer;
+  }
+
+  @include hover {
+    &:enabled {
+      box-shadow:
+        inset 0 0 0.1rem -0.025rem #ffd700,
+        0 0 0.1rem -0.025rem #ffd700;
+    }
+  }
 }
 
 .ghost-label {
   font-size: var(--text-base);
   line-height: 1;
   color: #f0f0f0;
+  transition: color 0.3s;
 
   &.selected {
     font-weight: 700;
+    color: #ffd700;
   }
 }
 </style>
