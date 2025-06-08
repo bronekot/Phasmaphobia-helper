@@ -2,10 +2,8 @@
   "name": "phasmaphobia-helper",
   "version": "1.4.1",
   "description": "Phasmophobia Helper - A Vue.js application to identify ghosts based on clues.",
-  "main": "phasma.html",
-  "scripts": {
-    "build": "html-minifier-terser --collapse-whitespace --remove-comments --remove-optional-tags --remove-redundant-attributes --remove-script-type-attributes --remove-tag-whitespace --use-short-doctype --minify-css true --minify-js true phasma.html -o build/phasma.html"
-  },
+  "private": true,
+  "type": "module",
   "keywords": [
     "Phasmophobia",
     "Ghost Helper",
@@ -15,7 +13,32 @@
   ],
   "author": "TactiKot",
   "license": "BSD 3-Clause",
+  "scripts": {
+    "cleanup": "nuxt cleanup",
+    "build": "nuxt cleanup && nuxt build",
+    "build:static": "nuxt cleanup && nuxt build --preset=static",
+    "dev": "nuxt cleanup && nuxt dev",
+    "generate": "nuxt generate",
+    "preview": "nuxt preview",
+    "postinstall": "nuxt prepare",
+    "fix": "prettier -luw . && eslint . --fix"
+  },
+  "dependencies": {
+    "@nuxt/eslint": "^1.4.1",
+    "@nuxt/icon": "^1.13.0",
+    "eslint": "^9.28.0",
+    "modern-normalize": "^3.0.1",
+    "nuxt": "^3.17.5",
+    "vue": "^3.5.16",
+    "vue-router": "^4.5.1"
+  },
   "devDependencies": {
-    "html-minifier-terser": "^7.2.0"
+    "@iconify-json/fa6-solid": "^1.2.3",
+    "prettier": "^3.5.3",
+    "sass-embedded": "^1.89.1",
+    "stylelint": "^16.20.0",
+    "stylelint-config-clean-order": "^7.0.0",
+    "stylelint-config-html": "^1.1.0",
+    "stylelint-config-standard-scss": "^15.0.1"
   }
 }
