@@ -15,7 +15,10 @@ const clues = ref<Array<{ id: ClueId; label: string; status: ClueStatus }>>([
   <div class="clue-list">
     <div class="header">
       <h2 class="heading">Улики</h2>
-      <button class="reset-button">
+      <button
+        class="reset-button"
+        aria-label="Сбросить всё"
+      >
         <Icon name="fa6-solid:arrows-rotate" />
       </button>
     </div>
@@ -32,6 +35,7 @@ const clues = ref<Array<{ id: ClueId; label: string; status: ClueStatus }>>([
           <button
             class="clue-button"
             :disabled="clue.status === 'positive'"
+            aria-label="Подтвердить"
             @click="clue.status = 'positive'"
           >
             <Icon name="fa6-solid:check" />
@@ -39,6 +43,7 @@ const clues = ref<Array<{ id: ClueId; label: string; status: ClueStatus }>>([
           <button
             class="clue-button"
             :disabled="clue.status === 'neutral'"
+            aria-label="Сбросить"
             @click="clue.status = 'neutral'"
           >
             <Icon name="fa6-solid:arrow-rotate-left" />
@@ -46,6 +51,7 @@ const clues = ref<Array<{ id: ClueId; label: string; status: ClueStatus }>>([
           <button
             class="clue-button"
             :disabled="clue.status === 'negative'"
+            aria-label="Вычеркнуть"
             @click="clue.status = 'negative'"
           >
             <Icon name="fa6-solid:xmark" />
@@ -70,6 +76,10 @@ const clues = ref<Array<{ id: ClueId; label: string; status: ClueStatus }>>([
 
   @include breakpoint-xs {
     padding: 0.9375rem;
+  }
+
+  @include breakpoint-sm {
+    gap: 0.5rem;
   }
 }
 
@@ -100,6 +110,8 @@ const clues = ref<Array<{ id: ClueId; label: string; status: ClueStatus }>>([
 .reset-button {
   cursor: pointer;
 
+  position: relative;
+
   display: flex;
   align-items: center;
   justify-content: center;
@@ -115,8 +127,51 @@ const clues = ref<Array<{ id: ClueId; label: string; status: ClueStatus }>>([
 
   transition: background-color 0.3s ease;
 
+  @include breakpoint-xs {
+    width: 32px;
+    height: 32px;
+  }
+
+  @include breakpoint-sm {
+    width: 36px;
+    height: 36px;
+  }
+
+  &::before {
+    content: attr(aria-label);
+
+    position: absolute;
+    z-index: -1;
+    bottom: 125%;
+
+    padding: 0.375rem;
+    border-radius: 0.25rem;
+
+    font-size: var(--text-xxs);
+    color: #fff;
+
+    opacity: 0;
+    background-color: #333;
+
+    transition: opacity 0.3s ease;
+
+    @include breakpoint-xs {
+      font-size: var(--text-xs);
+    }
+
+    @include breakpoint-sm {
+      padding: 0.5rem;
+      font-size: var(--text-sm);
+    }
+  }
+
   @include hover {
     background-color: #9e9e9e;
+
+    &::before {
+      z-index: unset;
+      opacity: 1;
+    }
   }
 }
 
@@ -168,7 +223,7 @@ const clues = ref<Array<{ id: ClueId; label: string; status: ClueStatus }>>([
 }
 
 .clue-button {
-  cursor: pointer;
+  position: relative;
 
   display: flex;
   align-items: center;
@@ -185,12 +240,47 @@ const clues = ref<Array<{ id: ClueId; label: string; status: ClueStatus }>>([
 
   transition: background-color 0.3s ease;
 
-  &:disabled {
-    pointer-events: none;
+  &::before {
+    content: attr(aria-label);
+
+    position: absolute;
+    z-index: -1;
+    bottom: 125%;
+
+    padding: 0.375rem;
+    border-radius: 0.25rem;
+
+    font-size: var(--text-xxs);
+    color: #fff;
+
+    opacity: 0;
+    background-color: #333;
+
+    transition: opacity 0.3s ease;
+
+    @include breakpoint-xs {
+      font-size: var(--text-xs);
+    }
+
+    @include breakpoint-sm {
+      padding: 0.5rem;
+      font-size: var(--text-sm);
+    }
+  }
+
+  &:enabled {
+    cursor: pointer;
   }
 
   @include hover {
-    background-color: #777;
+    &::before {
+      z-index: unset;
+      opacity: 1;
+    }
+
+    &:enabled {
+      background-color: #777;
+    }
   }
 }
 </style>
