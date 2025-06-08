@@ -22,7 +22,7 @@
   align-items: center;
 
   width: 100%;
-  max-width: 56.25rem;
+  max-width: 56rem;
   padding: 0.25rem;
   border-radius: 0.25rem;
 
