@@ -178,10 +178,10 @@ const clueItems = ref<ClueItem[]>([
   }
 
   &::before {
+    pointer-events: none;
     content: attr(aria-label);
 
     position: absolute;
-    z-index: -1;
     bottom: 125%;
 
     padding: 0.375rem;
@@ -209,7 +209,6 @@ const clueItems = ref<ClueItem[]>([
     background-color: #9e9e9e;
 
     &::before {
-      z-index: unset;
       opacity: 1;
     }
   }
@@ -281,10 +280,10 @@ const clueItems = ref<ClueItem[]>([
   transition: background-color 0.3s ease;
 
   &::before {
+    pointer-events: none;
     content: attr(aria-label);
 
     position: absolute;
-    z-index: -1;
     bottom: 125%;
 
     padding: 0.375rem;
@@ -314,7 +313,6 @@ const clueItems = ref<ClueItem[]>([
 
   @include hover {
     &::before {
-      z-index: unset;
       opacity: 1;
     }
 

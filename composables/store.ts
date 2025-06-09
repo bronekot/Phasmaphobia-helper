@@ -5,5 +5,5 @@ export function useCurrentDifficulty() {
 }
 
 export function useSelectedGhost() {
-  return useState<GhostId | null>('selected-ghost');
+  return useState<GhostId | null>('selected-ghost', () => null);
 }
