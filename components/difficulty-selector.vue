@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { GameDifficultyId } from '#imports';
 
-const activeButton = ref<GameDifficultyId>(GameDifficultyId.Amateur);
+const activeButton = useCurrentDifficulty();
 
 interface DifficultyButton {
   id: GameDifficultyId;

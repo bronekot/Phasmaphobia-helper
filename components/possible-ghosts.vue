@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { GhostId } from '#imports';
 
-const selectedGhost = ref<GhostId | null>(null);
+const selectedGhost = useSelectedGhost();
 
 interface GhostButton {
   id: GhostId;

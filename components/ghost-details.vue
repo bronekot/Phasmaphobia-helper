@@ -1,29 +1,22 @@
 <script setup lang="ts">
-const mock = {
-  heading: 'Ревенант',
-  description:
-    'Во время охоты движется очень медленно (1 м/с), пока не получит прямую видимость игрока (3 м/с). Это делает крайне важным спрятаться как можно скорее после начала охоты. Потеряв прямую видимость, он сохраняет скорость до достижения последней известной позиции игрока, которого видел. Скорость призрака постепенно снижается после потери прямой видимости.',
-  clues: [
-    { id: '1', label: 'Записи в блокноте' },
-    { id: '2', label: 'Минусовая температура' },
-    { id: '3', label: 'Призрачный огонёк' },
-    { id: '4', label: 'След на соли' },
-  ],
-};
+const selectedGhost = useSelectedGhost();
 </script>
 
 <template>
-  <div class="ghost-details">
-    <h2 class="heading"> {{ mock.heading }} </h2>
-    <p class="description"> {{ mock.description }} </p>
+  <div
+    v-if="selectedGhost"
+    class="ghost-details"
+  >
+    <h2 class="heading"> {{ ghostsData[selectedGhost].label }} </h2>
+    <p class="description"> {{ ghostsData[selectedGhost].description }} </p>
     <h3 class="subheading">Улики:</h3>
     <ul class="clues">
       <li
-        v-for="clue in mock.clues"
-        :key="clue.id"
+        v-for="clue in ghostsData[selectedGhost].clues"
+        :key="clue"
         class="clue"
       >
-        {{ clue.label }}
+        {{ cluesData[clue].label }}
       </li>
     </ul>
   </div>
