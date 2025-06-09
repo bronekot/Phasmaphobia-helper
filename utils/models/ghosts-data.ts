@@ -1,4 +1,5 @@
-import { ClueId, GhostId } from '~/utils';
+import { ClueId } from '~/utils/types/clue-id.enum';
+import { GhostId } from '~/utils/types/ghost-id.enum';
 
 interface Ghost {
   readonly id: GhostId;

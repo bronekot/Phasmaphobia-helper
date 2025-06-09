@@ -3,23 +3,29 @@ const selectedGhost = useSelectedGhost();
 </script>
 
 <template>
-  <div
-    v-if="selectedGhost"
-    class="ghost-details"
+  <Transition
+    name="fade"
+    mode="out-in"
   >
-    <h2 class="heading"> {{ ghostsData[selectedGhost].label }} </h2>
-    <p class="description"> {{ ghostsData[selectedGhost].description }} </p>
-    <h3 class="subheading">Улики:</h3>
-    <ul class="clues">
-      <li
-        v-for="clue in ghostsData[selectedGhost].clues"
-        :key="clue"
-        class="clue"
-      >
-        {{ cluesData[clue].label }}
-      </li>
-    </ul>
-  </div>
+    <div
+      v-if="selectedGhost"
+      :key="selectedGhost"
+      class="ghost-details"
+    >
+      <h2 class="heading"> {{ ghostsData[selectedGhost].label }} </h2>
+      <p class="description"> {{ ghostsData[selectedGhost].description }} </p>
+      <h3 class="subheading">Улики:</h3>
+      <ul class="clues">
+        <li
+          v-for="clue in ghostsData[selectedGhost].clues"
+          :key="clue"
+          class="clue"
+        >
+          {{ cluesData[clue].label }}
+        </li>
+      </ul>
+    </div>
+  </Transition>
 </template>
 
 <style scoped lang="scss">
@@ -122,5 +128,15 @@ const selectedGhost = useSelectedGhost();
   @include breakpoint-md {
     font-size: var(--text-lg);
   }
+}
+
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.3s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
 }
 </style>
