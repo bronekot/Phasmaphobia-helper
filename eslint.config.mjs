@@ -3,6 +3,7 @@ import withNuxt from './.nuxt/eslint.config.mjs';
 
 export default withNuxt({
   rules: {
+    '@typescript-eslint/consistent-type-definitions': 'error',
     '@typescript-eslint/array-type': ['error', { default: 'array-simple' }],
     'vue/html-self-closing': 'off',
   },

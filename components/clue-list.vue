@@ -1,13 +1,53 @@
 <script setup lang="ts">
-const clues = ref<Array<{ id: ClueId; label: string; status: ClueStatus }>>([
-  { id: 'emf-level-5', label: 'ЭМП 5 уровня', status: 'positive' },
-  { id: 'ultraviolet', label: 'Ультрафиолет', status: 'neutral' },
-  { id: 'ghost-writing', label: 'Записи в блокноте', status: 'neutral' },
-  { id: 'freezing-temperatures', label: 'Минусовая температура', status: 'neutral' },
-  { id: 'dots-projector', label: 'Лазерный проектор', status: 'neutral' },
-  { id: 'ghost-orb', label: 'Призрачный огонёк', status: 'neutral' },
-  { id: 'spirit-box', label: 'Радиоприёмник', status: 'neutral' },
-  { id: 'disturbed-salt-pile', label: 'След на соли', status: 'neutral' },
+import { ClueId } from '#imports';
+
+interface ClueItem {
+  id: ClueId;
+  label: string;
+  status: 'positive' | 'neutral' | 'negative';
+}
+
+const clueItems = ref<ClueItem[]>([
+  {
+    id: ClueId.EmfLevel5,
+    label: cluesData[ClueId.EmfLevel5].label,
+    status: 'positive',
+  },
+  {
+    id: ClueId.Ultraviolet,
+    label: cluesData[ClueId.Ultraviolet].label,
+    status: 'neutral',
+  },
+  {
+    id: ClueId.GhostWriting,
+    label: cluesData[ClueId.GhostWriting].label,
+    status: 'neutral',
+  },
+  {
+    id: ClueId.FreezingTemperatures,
+    label: cluesData[ClueId.FreezingTemperatures].label,
+    status: 'neutral',
+  },
+  {
+    id: ClueId.DotsProjector,
+    label: cluesData[ClueId.DotsProjector].label,
+    status: 'neutral',
+  },
+  {
+    id: ClueId.GhostOrb,
+    label: cluesData[ClueId.GhostOrb].label,
+    status: 'neutral',
+  },
+  {
+    id: ClueId.SpiritBox,
+    label: cluesData[ClueId.SpiritBox].label,
+    status: 'neutral',
+  },
+  {
+    id: ClueId.DisturbedSaltPile,
+    label: cluesData[ClueId.DisturbedSaltPile].label,
+    status: 'neutral',
+  },
 ]);
 </script>
 
@@ -24,7 +64,7 @@ const clues = ref<Array<{ id: ClueId; label: string; status: ClueStatus }>>([
     </div>
     <div class="list">
       <div
-        v-for="clue in clues"
+        v-for="clue in clueItems"
         :key="clue.id"
         :class="['clue', { [clue.status]: clue.status !== 'neutral' }]"
       >

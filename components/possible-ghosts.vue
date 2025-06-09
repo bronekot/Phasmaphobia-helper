@@ -1,32 +1,39 @@
 <script setup lang="ts">
+import { GhostId } from '#imports';
+
 const selectedGhost = ref<GhostId | null>(null);
 
-const ghosts = [
-  { id: 'spirit', label: 'Дух' },
-  { id: 'wraith', label: 'Мираж' },
-  { id: 'phantom', label: 'Фантом' },
-  { id: 'poltergeist', label: 'Полтергейст' },
-  { id: 'banshee', label: 'Банши' },
-  { id: 'jinn', label: 'Джинн' },
-  { id: 'mare', label: 'Мара' },
-  { id: 'revenant', label: 'Ревенант' },
-  { id: 'shade', label: 'Тень' },
-  { id: 'demon', label: 'Демон' },
-  { id: 'yurei', label: 'Юрэй' },
-  { id: 'oni', label: 'Они' },
-  { id: 'yokai', label: 'Ёкай' },
-  { id: 'hantu', label: 'Ханту' },
-  { id: 'goryo', label: 'Горё' },
-  { id: 'myling', label: 'Мюлинг' },
-  { id: 'onryo', label: 'Онрё' },
-  { id: 'the-twins', label: 'Близнецы' },
-  { id: 'raiju', label: 'Райдзю' },
-  { id: 'obake', label: 'Обакэ' },
-  { id: 'the-mimic', label: 'Мимик' },
-  { id: 'moroi', label: 'Морой' },
-  { id: 'deogen', label: 'Деоген' },
-  { id: 'thaye', label: 'Тайэ' },
-] satisfies Array<{ id: GhostId; label: string }>;
+interface GhostButton {
+  id: GhostId;
+  label: string;
+}
+
+const ghostButtons: GhostButton[] = [
+  { id: GhostId.Spirit, label: ghostsData[GhostId.Spirit].label },
+  { id: GhostId.Wraith, label: ghostsData[GhostId.Wraith].label },
+  { id: GhostId.Phantom, label: ghostsData[GhostId.Phantom].label },
+  { id: GhostId.Poltergeist, label: ghostsData[GhostId.Poltergeist].label },
+  { id: GhostId.Banshee, label: ghostsData[GhostId.Banshee].label },
+  { id: GhostId.Jinn, label: ghostsData[GhostId.Jinn].label },
+  { id: GhostId.Mare, label: ghostsData[GhostId.Mare].label },
+  { id: GhostId.Revenant, label: ghostsData[GhostId.Revenant].label },
+  { id: GhostId.Shade, label: ghostsData[GhostId.Shade].label },
+  { id: GhostId.Demon, label: ghostsData[GhostId.Demon].label },
+  { id: GhostId.Yurei, label: ghostsData[GhostId.Yurei].label },
+  { id: GhostId.Oni, label: ghostsData[GhostId.Oni].label },
+  { id: GhostId.Yokai, label: ghostsData[GhostId.Yokai].label },
+  { id: GhostId.Hantu, label: ghostsData[GhostId.Hantu].label },
+  { id: GhostId.Goryo, label: ghostsData[GhostId.Goryo].label },
+  { id: GhostId.Myling, label: ghostsData[GhostId.Myling].label },
+  { id: GhostId.Onryo, label: ghostsData[GhostId.Onryo].label },
+  { id: GhostId.TheTwins, label: ghostsData[GhostId.TheTwins].label },
+  { id: GhostId.Raiju, label: ghostsData[GhostId.Raiju].label },
+  { id: GhostId.Obake, label: ghostsData[GhostId.Obake].label },
+  { id: GhostId.TheMimic, label: ghostsData[GhostId.TheMimic].label },
+  { id: GhostId.Moroi, label: ghostsData[GhostId.Moroi].label },
+  { id: GhostId.Deogen, label: ghostsData[GhostId.Deogen].label },
+  { id: GhostId.Thaye, label: ghostsData[GhostId.Thaye].label },
+];
 </script>
 
 <template>
@@ -34,7 +41,7 @@ const ghosts = [
     <h2 class="heading">Возможные призраки</h2>
     <div class="list">
       <button
-        v-for="ghost in ghosts"
+        v-for="ghost in ghostButtons"
         :key="ghost.id"
         class="ghost-button"
         @click="selectedGhost = selectedGhost !== ghost.id ? ghost.id : null"

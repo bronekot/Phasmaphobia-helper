@@ -1,13 +1,53 @@
 <script setup lang="ts">
-const activeButton = ref<GameDifficulty>('amateur');
+import { GameDifficultyId } from '#imports';
 
-const buttons = [
-  { id: 'amateur', class: 'amateur', icon: 'fa6-solid:baby', label: 'Любитель' },
-  { id: 'intermediate', class: 'intermediate', icon: 'fa6-solid:user', label: 'Средняя' },
-  { id: 'professional', class: 'professional', icon: 'fa6-solid:user-tie', label: 'Профессионал' },
-  { id: 'nightmare', class: 'nightmare', icon: 'fa6-solid:skull', label: 'Кошмар' },
-  { id: 'insanity', class: 'insanity', icon: 'fa6-solid:face-dizzy', label: 'Безумие' },
-] satisfies Array<{ id: GameDifficulty } & Record<'class' | 'icon' | 'label', string>>;
+const activeButton = ref<GameDifficultyId>(GameDifficultyId.Amateur);
+
+interface DifficultyButton {
+  id: GameDifficultyId;
+  icon: string;
+  label: string;
+  borderColor: string;
+  backgroundColor: string;
+}
+
+const difficultyButtons: DifficultyButton[] = [
+  {
+    id: GameDifficultyId.Amateur,
+    icon: 'fa6-solid:baby',
+    label: gameDifficultiesData[GameDifficultyId.Amateur].label,
+    borderColor: '#4caf50',
+    backgroundColor: '#2a3e2b',
+  },
+  {
+    id: GameDifficultyId.Intermediate,
+    icon: 'fa6-solid:user',
+    label: gameDifficultiesData[GameDifficultyId.Intermediate].label,
+    borderColor: '#2196f3',
+    backgroundColor: '#22394c',
+  },
+  {
+    id: GameDifficultyId.Professional,
+    icon: 'fa6-solid:user-tie',
+    label: gameDifficultiesData[GameDifficultyId.Professional].label,
+    borderColor: '#ff9800',
+    backgroundColor: '#4e391b',
+  },
+  {
+    id: GameDifficultyId.Nightmare,
+    icon: 'fa6-solid:skull',
+    label: gameDifficultiesData[GameDifficultyId.Nightmare].label,
+    borderColor: '#f44336',
+    backgroundColor: '#4c2826',
+  },
+  {
+    id: GameDifficultyId.Insanity,
+    icon: 'fa6-solid:face-dizzy',
+    label: gameDifficultiesData[GameDifficultyId.Insanity].label,
+    borderColor: '#9c27b0',
+    backgroundColor: '#3a233e',
+  },
+];
 </script>
 
 <template>
@@ -15,9 +55,13 @@ const buttons = [
     <h2 class="heading"> Выберите сложность: </h2>
     <div class="buttons">
       <button
-        v-for="button in buttons"
+        v-for="button in difficultyButtons"
         :key="button.id"
-        :class="['button', button.class, { active: activeButton === button.id }]"
+        :class="['button', { active: activeButton === button.id }]"
+        :style="{
+          '--background-color': button.backgroundColor,
+          '--border-color': button.borderColor,
+        }"
         @click="activeButton = button.id"
       >
         <Icon
@@ -105,32 +149,9 @@ const buttons = [
   }
 
   &.active {
+    border-color: var(--border-color);
+    background-color: var(--background-color);
     box-shadow: 0 0 0.625rem #fff3;
-
-    &.amateur {
-      border-color: #4caf50;
-      background-color: #2a3e2b;
-    }
-
-    &.intermediate {
-      border-color: #2196f3;
-      background-color: #22394c;
-    }
-
-    &.professional {
-      border-color: #ff9800;
-      background-color: #4e391b;
-    }
-
-    &.nightmare {
-      border-color: #f44336;
-      background-color: #4c2826;
-    }
-
-    &.insanity {
-      border-color: #9c27b0;
-      background-color: #3a233e;
-    }
   }
 
   @include breakpoint-xs {
