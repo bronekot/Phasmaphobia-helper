@@ -7,8 +7,6 @@ export default withNuxt({
     '@stylistic': stylistic,
   },
   rules: {
-    'sort-imports': 'error',
-
     '@typescript-eslint/array-type': ['error', { default: 'array-simple' }],
     '@typescript-eslint/consistent-type-definitions': 'error',
     '@typescript-eslint/member-ordering': 'error',

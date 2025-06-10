@@ -1,10 +1,19 @@
+<script setup lang="ts">
+import { GameDifficultyId, type GhostId } from '#imports';
+
+const currentDifficulty = ref<GameDifficultyId>(GameDifficultyId.Amateur);
+const selectedGhost = ref<GhostId | null>(null);
+</script>
+
 <template>
   <div class="app">
     <h1 class="heading"> Phasmophobia Ghost Identifier </h1>
-    <DifficultySelector />
+    <div> {{ currentDifficulty }} </div>
+    <div> {{ selectedGhost }} </div>
+    <DifficultySelector v-model:current-difficulty="currentDifficulty" />
     <ClueList />
-    <PossibleGhosts />
-    <GhostDetails />
+    <PossibleGhosts v-model:selected-ghost="selectedGhost" />
+    <GhostDetails :selected-ghost="selectedGhost" />
     <GhostsModeSwitcher />
   </div>
   <footer class="footer">

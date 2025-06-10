@@ -1,5 +1,7 @@
 <script setup lang="ts">
-const selectedGhost = useSelectedGhost();
+import type { GhostId } from '#imports';
+
+const { selectedGhost } = defineProps<{ selectedGhost: GhostId | null }>();
 </script>
 
 <template>

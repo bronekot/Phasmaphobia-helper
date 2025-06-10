@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { GameDifficultyId } from '#imports';
 
-const activeButton = useCurrentDifficulty();
+const currentDifficulty = defineModel<GameDifficultyId>('current-difficulty', { required: true });
 
 interface DifficultyButton {
   id: GameDifficultyId;
@@ -57,12 +57,12 @@ const difficultyButtons: DifficultyButton[] = [
       <button
         v-for="button in difficultyButtons"
         :key="button.id"
-        :class="['button', { active: activeButton === button.id }]"
+        :class="['button', { active: currentDifficulty === button.id }]"
         :style="{
           '--background-color': button.backgroundColor,
           '--border-color': button.borderColor,
         }"
-        @click="activeButton = button.id"
+        @click="currentDifficulty = button.id"
       >
         <Icon
           class="button-icon"

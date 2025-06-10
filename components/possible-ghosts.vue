@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { GhostId } from '#imports';
 
-const selectedGhost = useSelectedGhost();
+const selectedGhost = defineModel<GhostId | null>('selected-ghost', { required: true });
 
 interface GhostButton {
   id: GhostId;
