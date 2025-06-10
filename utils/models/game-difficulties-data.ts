@@ -1,4 +1,4 @@
-import { GameDifficultyId } from '~/utils/types/game-difficulty-id.enum';
+import { GameDifficultyId } from '~/utils/schemas/game-difficulty-id.schema';
 
 interface GameDifficulty {
   readonly id: GameDifficultyId;

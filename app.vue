@@ -1,8 +1,5 @@
 <script setup lang="ts">
-import { GameDifficultyId, type GhostId } from '#imports';
-
-const currentDifficulty = ref<GameDifficultyId>(GameDifficultyId.Amateur);
-const selectedGhost = ref<GhostId | null>(null);
+const { currentDifficulty, showAllGhosts, selectedGhost } = useAppSettings();
 </script>
 
 <template>
@@ -14,7 +11,7 @@ const selectedGhost = ref<GhostId | null>(null);
     <ClueList />
     <PossibleGhosts v-model:selected-ghost="selectedGhost" />
     <GhostDetails :selected-ghost="selectedGhost" />
-    <GhostsModeSwitcher />
+    <GhostsModeSwitcher v-model:show-all-ghosts="showAllGhosts" />
   </div>
   <footer class="footer">
     <span class="copyright"> © 2025 Phasmophobia Helper. Разработано TactiKot с ❤️ </span>
