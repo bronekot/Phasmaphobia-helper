@@ -5,8 +5,6 @@ const { currentDifficulty, showAllGhosts, selectedGhost } = useAppSettings();
 <template>
   <div class="app">
     <h1 class="heading"> Phasmophobia Ghost Identifier </h1>
-    <div> {{ currentDifficulty }} </div>
-    <div> {{ selectedGhost }} </div>
     <DifficultySelector v-model:current-difficulty="currentDifficulty" />
     <ClueList />
     <PossibleGhosts v-model:selected-ghost="selectedGhost" />
