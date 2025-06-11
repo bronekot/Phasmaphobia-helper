@@ -1,38 +1,38 @@
 <script setup lang="ts">
 import { GhostId } from '#imports';
 
-const selectedGhost = defineModel<GhostId | null>('selected-ghost', { required: true });
+defineProps<{
+  selectedGhost: GhostId | null;
+}>();
+defineEmits<{
+  updateSelectedGhost: [newSelectedGhost: GhostId];
+}>();
 
-interface GhostButton {
-  id: GhostId;
-  label: string;
-}
-
-const ghostButtons: GhostButton[] = [
-  { id: GhostId.Spirit, label: ghostsData[GhostId.Spirit].label },
-  { id: GhostId.Wraith, label: ghostsData[GhostId.Wraith].label },
-  { id: GhostId.Phantom, label: ghostsData[GhostId.Phantom].label },
-  { id: GhostId.Poltergeist, label: ghostsData[GhostId.Poltergeist].label },
-  { id: GhostId.Banshee, label: ghostsData[GhostId.Banshee].label },
-  { id: GhostId.Jinn, label: ghostsData[GhostId.Jinn].label },
-  { id: GhostId.Mare, label: ghostsData[GhostId.Mare].label },
-  { id: GhostId.Revenant, label: ghostsData[GhostId.Revenant].label },
-  { id: GhostId.Shade, label: ghostsData[GhostId.Shade].label },
-  { id: GhostId.Demon, label: ghostsData[GhostId.Demon].label },
-  { id: GhostId.Yurei, label: ghostsData[GhostId.Yurei].label },
-  { id: GhostId.Oni, label: ghostsData[GhostId.Oni].label },
-  { id: GhostId.Yokai, label: ghostsData[GhostId.Yokai].label },
-  { id: GhostId.Hantu, label: ghostsData[GhostId.Hantu].label },
-  { id: GhostId.Goryo, label: ghostsData[GhostId.Goryo].label },
-  { id: GhostId.Myling, label: ghostsData[GhostId.Myling].label },
-  { id: GhostId.Onryo, label: ghostsData[GhostId.Onryo].label },
-  { id: GhostId.TheTwins, label: ghostsData[GhostId.TheTwins].label },
-  { id: GhostId.Raiju, label: ghostsData[GhostId.Raiju].label },
-  { id: GhostId.Obake, label: ghostsData[GhostId.Obake].label },
-  { id: GhostId.TheMimic, label: ghostsData[GhostId.TheMimic].label },
-  { id: GhostId.Moroi, label: ghostsData[GhostId.Moroi].label },
-  { id: GhostId.Deogen, label: ghostsData[GhostId.Deogen].label },
-  { id: GhostId.Thaye, label: ghostsData[GhostId.Thaye].label },
+const ghostButtons: GhostId[] = [
+  GhostId.Spirit,
+  GhostId.Wraith,
+  GhostId.Phantom,
+  GhostId.Poltergeist,
+  GhostId.Banshee,
+  GhostId.Jinn,
+  GhostId.Mare,
+  GhostId.Revenant,
+  GhostId.Shade,
+  GhostId.Demon,
+  GhostId.Yurei,
+  GhostId.Oni,
+  GhostId.Yokai,
+  GhostId.Hantu,
+  GhostId.Goryo,
+  GhostId.Myling,
+  GhostId.Onryo,
+  GhostId.TheTwins,
+  GhostId.Raiju,
+  GhostId.Obake,
+  GhostId.TheMimic,
+  GhostId.Moroi,
+  GhostId.Deogen,
+  GhostId.Thaye,
 ];
 </script>
 
@@ -41,13 +41,13 @@ const ghostButtons: GhostButton[] = [
     <h2 class="heading">Возможные призраки</h2>
     <div class="list">
       <button
-        v-for="ghost in ghostButtons"
-        :key="ghost.id"
+        v-for="ghostId in ghostButtons"
+        :key="ghostId"
         class="ghost-button"
-        @click="selectedGhost = selectedGhost !== ghost.id ? ghost.id : null"
+        @click="$emit('updateSelectedGhost', ghostId)"
       >
-        <span :class="['ghost-label', { selected: selectedGhost === ghost.id }]">
-          {{ ghost.label }}
+        <span :class="['ghost-label', { selected: selectedGhost === ghostId }]">
+          {{ ghostsData[ghostId].label }}
         </span>
       </button>
     </div>

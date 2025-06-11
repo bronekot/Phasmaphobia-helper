@@ -1,28 +1,28 @@
 <script setup lang="ts">
-import { ClueId, ClueStatus } from '#imports';
-
-const { currentDifficulty, showAllGhosts, selectedGhost } = useAppSettings();
-
-const clueStates = ref<Record<ClueId, ClueStatus>>({
-  [ClueId.EmfLevel5]: ClueStatus.Null,
-  [ClueId.Ultraviolet]: ClueStatus.Null,
-  [ClueId.GhostWriting]: ClueStatus.Null,
-  [ClueId.FreezingTemperatures]: ClueStatus.Null,
-  [ClueId.DotsProjector]: ClueStatus.Null,
-  [ClueId.GhostOrb]: ClueStatus.Null,
-  [ClueId.SpiritBox]: ClueStatus.Null,
-  [ClueId.DisturbedSaltPile]: ClueStatus.Null,
-});
+const {
+  currentDifficulty,
+  clueStates,
+  selectedGhost,
+  showAllGhosts,
+  resetClues,
+  updateSelectedGhost,
+} = useAppSettings();
 </script>
 
 <template>
   <div class="app">
     <h1 class="heading"> Phasmophobia Ghost Identifier </h1>
-    <DifficultySelector v-model:current-difficulty="currentDifficulty" />
-    <ClueList v-model:clue-states="clueStates" />
-    <PossibleGhosts v-model:selected-ghost="selectedGhost" />
+    <DifficultySelector v-model="currentDifficulty" />
+    <ClueList
+      v-model="clueStates"
+      @reset-clues="resetClues"
+    />
+    <PossibleGhosts
+      :selected-ghost="selectedGhost"
+      @update-selected-ghost="updateSelectedGhost"
+    />
     <GhostDetails :selected-ghost="selectedGhost" />
-    <GhostsModeSwitcher v-model:show-all-ghosts="showAllGhosts" />
+    <GhostsModeSwitcher v-model="showAllGhosts" />
   </div>
   <footer class="footer">
     <span class="copyright"> © 2025 Phasmophobia Helper. Разработано TactiKot с ❤️ </span>

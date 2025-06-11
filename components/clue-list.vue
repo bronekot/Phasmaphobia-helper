@@ -1,88 +1,84 @@
 <script setup lang="ts">
-import type { ClueStatus } from '#imports';
-import { ClueId } from '#imports';
+import { ClueStatus, ClueId } from '#imports';
 
-const clueStates = defineModel<Record<string, ClueStatus>>('clue-states', { required: true });
+defineModel<Record<ClueId, ClueStatus>>({ required: true });
+defineEmits<{
+  resetClues: [];
+}>();
 
-interface ClueItem {
-  id: ClueId;
-  label: string;
-}
-
-const clueItems = ref<ClueItem[]>([
-  { id: ClueId.EmfLevel5, label: cluesData[ClueId.EmfLevel5].label },
-  { id: ClueId.Ultraviolet, label: cluesData[ClueId.Ultraviolet].label },
-  { id: ClueId.GhostWriting, label: cluesData[ClueId.GhostWriting].label },
-  { id: ClueId.FreezingTemperatures, label: cluesData[ClueId.FreezingTemperatures].label },
-  { id: ClueId.DotsProjector, label: cluesData[ClueId.DotsProjector].label },
-  { id: ClueId.GhostOrb, label: cluesData[ClueId.GhostOrb].label },
-  { id: ClueId.SpiritBox, label: cluesData[ClueId.SpiritBox].label },
-  { id: ClueId.DisturbedSaltPile, label: cluesData[ClueId.DisturbedSaltPile].label },
+const clueItems = ref<ClueId[]>([
+  ClueId.EmfLevel5,
+  ClueId.Ultraviolet,
+  ClueId.GhostWriting,
+  ClueId.FreezingTemperatures,
+  ClueId.DotsProjector,
+  ClueId.GhostOrb,
+  ClueId.SpiritBox,
+  ClueId.DisturbedSaltPile,
 ]);
+
+const clueItemButtons = [
+  { id: ClueStatus.Found, icon: 'fa6-solid:check', label: 'Подтвердить' },
+  { id: ClueStatus.Null, icon: 'fa6-solid:arrow-rotate-left', label: 'Сбросить' },
+  { id: ClueStatus.Excluded, icon: 'fa6-solid:xmark', label: 'Вычеркнуть' },
+];
+
+const formId = useId();
 </script>
 
 <template>
-  <div class="clue-list">
+  <form
+    class="clue-list"
+    @submit.prevent
+  >
     <div class="header">
       <h2 class="heading">Улики</h2>
       <button
         class="reset-button"
         aria-label="Сбросить всё"
-        @click="
-          () => {
-            Object.keys(clueStates).forEach((key) => {
-              clueStates[key] = ClueStatus.Null;
-            });
-          }
-        "
+        @click="$emit('resetClues')"
       >
         <Icon name="fa6-solid:arrows-rotate" />
       </button>
     </div>
     <div class="list">
-      <div
-        v-for="clue in clueItems"
-        :key="clue.id"
+      <fieldset
+        v-for="clueId in clueItems"
+        :key="clueId"
         :class="[
           'clue',
           {
-            positive: clueStates[clue.id] === ClueStatus.Found,
-            negative: clueStates[clue.id] === ClueStatus.Excluded,
+            positive: modelValue[clueId] === ClueStatus.Found,
+            negative: modelValue[clueId] === ClueStatus.Excluded,
           },
         ]"
       >
-        <span class="clue-label">
-          {{ clue.label }}
-        </span>
-        <div class="clue-buttons">
-          <button
-            class="clue-button"
-            :disabled="clueStates[clue.id] === ClueStatus.Found"
-            aria-label="Подтвердить"
-            @click="clueStates[clue.id] = ClueStatus.Found"
+        <legend class="clue-label">
+          {{ cluesData[clueId].label }}
+        </legend>
+        <template
+          v-for="button in clueItemButtons"
+          :key="button.id"
+        >
+          <input
+            :id="`${formId}-${clueId}-${button.id}`"
+            v-model="modelValue[clueId]"
+            type="radio"
+            class="clue-button-input sr-only"
+            :name="`${formId}-${clueId}`"
+            :value="button.id"
+          />
+          <label
+            :for="`${formId}-${clueId}-${button.id}`"
+            class="clue-button-label"
+            :aria-label="button.label"
           >
-            <Icon name="fa6-solid:check" />
-          </button>
-          <button
-            class="clue-button"
-            :disabled="clueStates[clue.id] === ClueStatus.Null"
-            aria-label="Сбросить"
-            @click="clueStates[clue.id] = ClueStatus.Null"
-          >
-            <Icon name="fa6-solid:arrow-rotate-left" />
-          </button>
-          <button
-            class="clue-button"
-            :disabled="clueStates[clue.id] === ClueStatus.Excluded"
-            aria-label="Вычеркнуть"
-            @click="clueStates[clue.id] = ClueStatus.Excluded"
-          >
-            <Icon name="fa6-solid:xmark" />
-          </button>
-        </div>
-      </div>
+            <Icon :name="button.icon" />
+          </label>
+        </template>
+      </fieldset>
     </div>
-  </div>
+  </form>
 </template>
 
 <style scoped lang="scss">
@@ -209,6 +205,7 @@ const clueItems = ref<ClueItem[]>([
   align-items: center;
 
   padding: 0.375rem 0.5rem;
+  border: unset;
 
   transition: background-color 0.3s ease;
 
@@ -230,6 +227,7 @@ const clueItems = ref<ClueItem[]>([
 }
 
 .clue-label {
+  float: left;
   flex-grow: 1;
   font-size: var(--text-sm);
   line-height: 1;
@@ -239,12 +237,7 @@ const clueItems = ref<ClueItem[]>([
   }
 }
 
-.clue-buttons {
-  display: flex;
-  gap: 0.3125rem;
-}
-
-.clue-button {
+.clue-button-label {
   position: relative;
 
   display: flex;
@@ -253,7 +246,6 @@ const clueItems = ref<ClueItem[]>([
 
   width: 2.25rem;
   height: 2.25rem;
-  border: unset;
   border-radius: 0.1875rem;
 
   color: #eee;
@@ -290,18 +282,24 @@ const clueItems = ref<ClueItem[]>([
     }
   }
 
-  &:enabled {
-    cursor: pointer;
-  }
-
   @include hover {
     &::before {
       opacity: 1;
     }
+  }
+}
 
-    &:enabled {
+.clue-button-input {
+  &:not(:checked) + .clue-button-label {
+    cursor: pointer;
+
+    @include hover {
       background-color: #777;
     }
+  }
+
+  &:focus-visible + .clue-button-label {
+    outline: 0.0625rem auto #101010;
   }
 }
 </style>

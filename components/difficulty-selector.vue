@@ -1,78 +1,89 @@
 <script setup lang="ts">
 import { GameDifficultyId } from '#imports';
 
-const currentDifficulty = defineModel<GameDifficultyId>('current-difficulty', { required: true });
+const currentDifficulty = defineModel<GameDifficultyId>();
 
-interface DifficultyButton {
+interface DifficultyItem {
   id: GameDifficultyId;
   icon: string;
-  label: string;
   borderColor: string;
   backgroundColor: string;
 }
 
-const difficultyButtons: DifficultyButton[] = [
+const difficultyItems: DifficultyItem[] = [
   {
     id: GameDifficultyId.Amateur,
     icon: 'fa6-solid:baby',
-    label: gameDifficultiesData[GameDifficultyId.Amateur].label,
     borderColor: '#4caf50',
     backgroundColor: '#2a3e2b',
   },
   {
     id: GameDifficultyId.Intermediate,
     icon: 'fa6-solid:user',
-    label: gameDifficultiesData[GameDifficultyId.Intermediate].label,
     borderColor: '#2196f3',
     backgroundColor: '#22394c',
   },
   {
     id: GameDifficultyId.Professional,
     icon: 'fa6-solid:user-tie',
-    label: gameDifficultiesData[GameDifficultyId.Professional].label,
     borderColor: '#ff9800',
     backgroundColor: '#4e391b',
   },
   {
     id: GameDifficultyId.Nightmare,
     icon: 'fa6-solid:skull',
-    label: gameDifficultiesData[GameDifficultyId.Nightmare].label,
     borderColor: '#f44336',
     backgroundColor: '#4c2826',
   },
   {
     id: GameDifficultyId.Insanity,
     icon: 'fa6-solid:face-dizzy',
-    label: gameDifficultiesData[GameDifficultyId.Insanity].label,
     borderColor: '#9c27b0',
     backgroundColor: '#3a233e',
   },
 ];
+
+const formId = useId();
 </script>
 
 <template>
   <div class="difficulty-selector">
     <h2 class="heading"> Выберите сложность: </h2>
-    <div class="buttons">
-      <button
-        v-for="button in difficultyButtons"
-        :key="button.id"
-        :class="['button', { active: currentDifficulty === button.id }]"
-        :style="{
-          '--background-color': button.backgroundColor,
-          '--border-color': button.borderColor,
-        }"
-        @click="currentDifficulty = button.id"
+
+    <form
+      class="difficulties"
+      @submit.prevent
+    >
+      <template
+        v-for="difficulty in difficultyItems"
+        :key="difficulty.id"
       >
-        <Icon
-          class="button-icon"
-          :name="button.icon"
+        <input
+          :id="`${formId}-${difficulty.id}`"
+          v-model="currentDifficulty"
+          class="difficulty-input sr-only"
+          type="radio"
+          name="difficulty"
+          :value="difficulty.id"
         />
-        <span>
-          {{ button.label }}
-        </span>
-      </button>
-    </div>
+        <label
+          :for="`${formId}-${difficulty.id}`"
+          class="difficulty-label"
+          :style="{
+            '--background-color': difficulty.backgroundColor,
+            '--border-color': difficulty.borderColor,
+          }"
+        >
+          <Icon
+            class="difficulty-icon"
+            :name="difficulty.icon"
+          />
+          <span>
+            {{ gameDifficultiesData[difficulty.id].label }}
+          </span>
+        </label>
+      </template>
+    </form>
   </div>
 </template>
 
@@ -104,12 +115,10 @@ const difficultyButtons: DifficultyButton[] = [
   }
 }
 
-.buttons {
+.difficulties {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
   gap: 0.25rem;
-  align-items: center;
-
   width: 100%;
 
   @include breakpoint-xs {
@@ -123,9 +132,7 @@ const difficultyButtons: DifficultyButton[] = [
   }
 }
 
-.button {
-  cursor: pointer;
-
+.difficulty-label {
   display: flex;
   flex-direction: column;
   gap: 0.25rem;
@@ -144,16 +151,6 @@ const difficultyButtons: DifficultyButton[] = [
 
   transition: background-color 0.3s ease;
 
-  @include hover {
-    background-color: #444;
-  }
-
-  &.active {
-    border-color: var(--border-color);
-    background-color: var(--background-color);
-    box-shadow: 0 0 0.625rem #fff3;
-  }
-
   @include breakpoint-xs {
     flex-direction: row;
     padding: 0.625rem 0.375rem;
@@ -171,7 +168,28 @@ const difficultyButtons: DifficultyButton[] = [
   }
 }
 
-.button-icon {
+.difficulty-input {
+  &:not(:checked) + .difficulty-label {
+    cursor: pointer;
+
+    @include hover {
+      background-color: #444;
+    }
+  }
+
+  &:checked + .difficulty-label {
+    border-color: var(--border-color);
+    background-color: var(--background-color);
+    box-shadow: 0 0 0.625rem #fff3;
+  }
+
+  &:focus-visible + .difficulty-label {
+    outline: 0.0625rem auto #101010;
+    outline-offset: 2px;
+  }
+}
+
+.difficulty-icon {
   width: 1.25rem;
   height: 1.25rem;
 }

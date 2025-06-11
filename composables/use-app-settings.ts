@@ -1,4 +1,4 @@
-import type { GhostId } from '#imports';
+import { ClueId, ClueStatus, type GhostId } from '#imports';
 import { GameDifficultyId } from '#imports';
 import { z } from 'zod/v4-mini';
 
@@ -16,13 +16,38 @@ const SELECTED_GHOST = {
   defaultValue: null,
 } as const;
 
+const CLUE_STATES = {
+  defaultValue: {
+    [ClueId.EmfLevel5]: ClueStatus.Null,
+    [ClueId.Ultraviolet]: ClueStatus.Null,
+    [ClueId.GhostWriting]: ClueStatus.Null,
+    [ClueId.FreezingTemperatures]: ClueStatus.Null,
+    [ClueId.DotsProjector]: ClueStatus.Null,
+    [ClueId.GhostOrb]: ClueStatus.Null,
+    [ClueId.SpiritBox]: ClueStatus.Null,
+    [ClueId.DisturbedSaltPile]: ClueStatus.Null,
+  },
+} as const;
+
 const currentDifficultySchema = gameDifficultyIdSchema;
 const showAllGhostsSchema = z.boolean();
 
 export function useAppSettings() {
   const currentDifficulty = ref<GameDifficultyId>(CURRENT_DIFFICULTY.defaultValue);
-  const showAllGhosts = ref<boolean>(SHOW_ALL_GHOSTS.defaultValue);
+
+  const clueStates = ref<Record<ClueId, ClueStatus>>(structuredClone(CLUE_STATES.defaultValue));
+
   const selectedGhost = ref<GhostId | null>(SELECTED_GHOST.defaultValue);
+
+  const showAllGhosts = ref<boolean>(SHOW_ALL_GHOSTS.defaultValue);
+
+  function resetClues(): void {
+    clueStates.value = CLUE_STATES.defaultValue;
+  }
+
+  function updateSelectedGhost(newSelectedGhost: GhostId): void {
+    selectedGhost.value = selectedGhost.value !== newSelectedGhost ? newSelectedGhost : null;
+  }
 
   watch(currentDifficulty, (value) => {
     localStorage.setItem(CURRENT_DIFFICULTY.key, JSON.stringify(value));
@@ -50,5 +75,12 @@ export function useAppSettings() {
     }
   });
 
-  return { currentDifficulty, showAllGhosts, selectedGhost };
+  return {
+    currentDifficulty,
+    clueStates,
+    selectedGhost,
+    showAllGhosts,
+    resetClues,
+    updateSelectedGhost,
+  };
 }

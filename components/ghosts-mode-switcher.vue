@@ -1,7 +1,7 @@
 <script setup lang="ts">
 const inputId = useId();
 
-const isChecked = defineModel<boolean>('show-all-ghosts', { required: true });
+const isChecked = defineModel<boolean>({ required: true });
 </script>
 
 <template>
