@@ -1,12 +1,12 @@
 export const ClueId = {
-  EmfLevel5: 'emf-level-5',
-  Ultraviolet: 'ultraviolet',
-  GhostWriting: 'ghost-writing',
-  FreezingTemperatures: 'freezing-temperatures',
-  DotsProjector: 'dots-projector',
-  GhostOrb: 'ghost-orb',
-  SpiritBox: 'spirit-box',
-  DisturbedSaltPile: 'disturbed-salt-pile',
+  EmfLevel5: 'EmfLevel5',
+  Ultraviolet: 'Ultraviolet',
+  GhostWriting: 'GhostWriting',
+  FreezingTemperatures: 'FreezingTemperatures',
+  DotsProjector: 'DotsProjector',
+  GhostOrb: 'GhostOrb',
+  SpiritBox: 'SpiritBox',
+  DisturbedSaltPile: 'DisturbedSaltPile',
 } as const;
 
 export type ClueId = ValueOf<typeof ClueId>;

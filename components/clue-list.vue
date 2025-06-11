@@ -1,53 +1,23 @@
 <script setup lang="ts">
+import type { ClueStatus } from '#imports';
 import { ClueId } from '#imports';
+
+const clueStates = defineModel<Record<string, ClueStatus>>('clue-states', { required: true });
 
 interface ClueItem {
   id: ClueId;
   label: string;
-  status: 'positive' | 'neutral' | 'negative';
 }
 
 const clueItems = ref<ClueItem[]>([
-  {
-    id: ClueId.EmfLevel5,
-    label: cluesData[ClueId.EmfLevel5].label,
-    status: 'positive',
-  },
-  {
-    id: ClueId.Ultraviolet,
-    label: cluesData[ClueId.Ultraviolet].label,
-    status: 'neutral',
-  },
-  {
-    id: ClueId.GhostWriting,
-    label: cluesData[ClueId.GhostWriting].label,
-    status: 'neutral',
-  },
-  {
-    id: ClueId.FreezingTemperatures,
-    label: cluesData[ClueId.FreezingTemperatures].label,
-    status: 'neutral',
-  },
-  {
-    id: ClueId.DotsProjector,
-    label: cluesData[ClueId.DotsProjector].label,
-    status: 'neutral',
-  },
-  {
-    id: ClueId.GhostOrb,
-    label: cluesData[ClueId.GhostOrb].label,
-    status: 'neutral',
-  },
-  {
-    id: ClueId.SpiritBox,
-    label: cluesData[ClueId.SpiritBox].label,
-    status: 'neutral',
-  },
-  {
-    id: ClueId.DisturbedSaltPile,
-    label: cluesData[ClueId.DisturbedSaltPile].label,
-    status: 'neutral',
-  },
+  { id: ClueId.EmfLevel5, label: cluesData[ClueId.EmfLevel5].label },
+  { id: ClueId.Ultraviolet, label: cluesData[ClueId.Ultraviolet].label },
+  { id: ClueId.GhostWriting, label: cluesData[ClueId.GhostWriting].label },
+  { id: ClueId.FreezingTemperatures, label: cluesData[ClueId.FreezingTemperatures].label },
+  { id: ClueId.DotsProjector, label: cluesData[ClueId.DotsProjector].label },
+  { id: ClueId.GhostOrb, label: cluesData[ClueId.GhostOrb].label },
+  { id: ClueId.SpiritBox, label: cluesData[ClueId.SpiritBox].label },
+  { id: ClueId.DisturbedSaltPile, label: cluesData[ClueId.DisturbedSaltPile].label },
 ]);
 </script>
 
@@ -58,6 +28,13 @@ const clueItems = ref<ClueItem[]>([
       <button
         class="reset-button"
         aria-label="Сбросить всё"
+        @click="
+          () => {
+            Object.keys(clueStates).forEach((key) => {
+              clueStates[key] = ClueStatus.Null;
+            });
+          }
+        "
       >
         <Icon name="fa6-solid:arrows-rotate" />
       </button>
@@ -66,7 +43,13 @@ const clueItems = ref<ClueItem[]>([
       <div
         v-for="clue in clueItems"
         :key="clue.id"
-        :class="['clue', { [clue.status]: clue.status !== 'neutral' }]"
+        :class="[
+          'clue',
+          {
+            positive: clueStates[clue.id] === ClueStatus.Found,
+            negative: clueStates[clue.id] === ClueStatus.Excluded,
+          },
+        ]"
       >
         <span class="clue-label">
           {{ clue.label }}
@@ -74,25 +57,25 @@ const clueItems = ref<ClueItem[]>([
         <div class="clue-buttons">
           <button
             class="clue-button"
-            :disabled="clue.status === 'positive'"
+            :disabled="clueStates[clue.id] === ClueStatus.Found"
             aria-label="Подтвердить"
-            @click="clue.status = 'positive'"
+            @click="clueStates[clue.id] = ClueStatus.Found"
           >
             <Icon name="fa6-solid:check" />
           </button>
           <button
             class="clue-button"
-            :disabled="clue.status === 'neutral'"
+            :disabled="clueStates[clue.id] === ClueStatus.Null"
             aria-label="Сбросить"
-            @click="clue.status = 'neutral'"
+            @click="clueStates[clue.id] = ClueStatus.Null"
           >
             <Icon name="fa6-solid:arrow-rotate-left" />
           </button>
           <button
             class="clue-button"
-            :disabled="clue.status === 'negative'"
+            :disabled="clueStates[clue.id] === ClueStatus.Excluded"
             aria-label="Вычеркнуть"
-            @click="clue.status = 'negative'"
+            @click="clueStates[clue.id] = ClueStatus.Excluded"
           >
             <Icon name="fa6-solid:xmark" />
           </button>
