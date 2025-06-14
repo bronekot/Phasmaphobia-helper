@@ -1,7 +1,9 @@
 <script setup lang="ts">
-import { GhostId } from '#imports';
+import { GhostId } from '~/utils';
 
 defineProps<{
+  possibleGhosts: Set<GhostId>;
+  showAllGhosts: boolean;
   selectedGhost: GhostId | null;
 }>();
 defineEmits<{
@@ -34,10 +36,16 @@ const ghostButtons: GhostId[] = [
   GhostId.Deogen,
   GhostId.Thaye,
 ];
+
+// TODO настроить отображение возможных призраков
 </script>
 
 <template>
   <div class="possible-ghosts">
+    <div>
+      <div> showAllGhosts: {{ showAllGhosts }} </div>
+      <div> possibleGhosts: {{ possibleGhosts }} </div>
+    </div>
     <h2 class="heading">Возможные призраки</h2>
     <div class="list">
       <button

@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { ClueStatus, ClueId } from '#imports';
+import { ClueId, ClueStatus } from '~/utils';
 
-defineModel<Record<ClueId, ClueStatus>>({ required: true });
+defineModel<Record<ClueId, { id: ClueId; status: ClueStatus }>>({ required: true });
 defineEmits<{
   resetClues: [];
 }>();
@@ -48,8 +48,10 @@ const formId = useId();
         :class="[
           'clue',
           {
-            positive: modelValue[clueId] === ClueStatus.Found,
-            negative: modelValue[clueId] === ClueStatus.Excluded,
+            positive: modelValue[clueId].status === ClueStatus.Found,
+            negative: modelValue[clueId].status === ClueStatus.Excluded,
+            inactive: false,
+            highlightedByGhost: false,
           },
         ]"
       >
@@ -62,7 +64,7 @@ const formId = useId();
         >
           <input
             :id="`${formId}-${clueId}-${button.id}`"
-            v-model="modelValue[clueId]"
+            v-model="modelValue[clueId].status"
             type="radio"
             class="clue-button-input sr-only"
             :name="`${formId}-${clueId}`"

@@ -3,7 +3,7 @@ export default defineNuxtConfig({
   ssr: false,
   compatibilityDate: '2025-05-15',
   devtools: { enabled: true },
-  modules: ['@nuxt/icon', '@nuxt/eslint'],
+  modules: ['@nuxt/test-utils/module', '@nuxt/icon', '@nuxt/eslint'],
   app: {
     head: {
       title: 'Phasmophobia Helper',

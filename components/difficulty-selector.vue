@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { GameDifficultyId } from '#imports';
+import { GameDifficultyId } from '~/utils';
 
 const currentDifficulty = defineModel<GameDifficultyId>();
 

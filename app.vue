@@ -4,9 +4,16 @@ const {
   clueStates,
   selectedGhost,
   showAllGhosts,
+  foundClues,
+  excludedClues,
+  possibleGhosts,
   resetClues,
   updateSelectedGhost,
 } = useAppSettings();
+
+// TODO распихать куда надо
+void foundClues;
+void excludedClues;
 </script>
 
 <template>
@@ -18,6 +25,8 @@ const {
       @reset-clues="resetClues"
     />
     <PossibleGhosts
+      :possible-ghosts="possibleGhosts"
+      :show-all-ghosts="showAllGhosts"
       :selected-ghost="selectedGhost"
       @update-selected-ghost="updateSelectedGhost"
     />

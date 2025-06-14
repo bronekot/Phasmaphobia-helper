@@ -1,6 +1,5 @@
-import { ClueId, ClueStatus, type GhostId } from '#imports';
-import { GameDifficultyId } from '#imports';
 import { z } from 'zod/v4-mini';
+import { ClueId, ClueStatus, GameDifficultyId, type GhostId } from '~/utils';
 
 const CURRENT_DIFFICULTY = {
   key: 'phasmaHelperDifficulty',
@@ -17,15 +16,17 @@ const SELECTED_GHOST = {
 } as const;
 
 const CLUE_STATES = {
-  defaultValue: {
-    [ClueId.EmfLevel5]: ClueStatus.Null,
-    [ClueId.Ultraviolet]: ClueStatus.Null,
-    [ClueId.GhostWriting]: ClueStatus.Null,
-    [ClueId.FreezingTemperatures]: ClueStatus.Null,
-    [ClueId.DotsProjector]: ClueStatus.Null,
-    [ClueId.GhostOrb]: ClueStatus.Null,
-    [ClueId.SpiritBox]: ClueStatus.Null,
-    [ClueId.DisturbedSaltPile]: ClueStatus.Null,
+  get defaultValue() {
+    return {
+      [ClueId.EmfLevel5]: { id: ClueId.EmfLevel5, status: ClueStatus.Null },
+      [ClueId.Ultraviolet]: { id: ClueId.Ultraviolet, status: ClueStatus.Null },
+      [ClueId.GhostWriting]: { id: ClueId.GhostWriting, status: ClueStatus.Null },
+      [ClueId.FreezingTemperatures]: { id: ClueId.FreezingTemperatures, status: ClueStatus.Null },
+      [ClueId.DotsProjector]: { id: ClueId.DotsProjector, status: ClueStatus.Null },
+      [ClueId.GhostOrb]: { id: ClueId.GhostOrb, status: ClueStatus.Null },
+      [ClueId.SpiritBox]: { id: ClueId.SpiritBox, status: ClueStatus.Null },
+      [ClueId.DisturbedSaltPile]: { id: ClueId.DisturbedSaltPile, status: ClueStatus.Null },
+    };
   },
 } as const;
 
@@ -35,11 +36,51 @@ const showAllGhostsSchema = z.boolean();
 export function useAppSettings() {
   const currentDifficulty = ref<GameDifficultyId>(CURRENT_DIFFICULTY.defaultValue);
 
-  const clueStates = ref<Record<ClueId, ClueStatus>>(structuredClone(CLUE_STATES.defaultValue));
+  const clueStates = ref<Record<ClueId, { id: ClueId; status: ClueStatus }>>(
+    CLUE_STATES.defaultValue
+  );
 
   const selectedGhost = ref<GhostId | null>(SELECTED_GHOST.defaultValue);
 
   const showAllGhosts = ref<boolean>(SHOW_ALL_GHOSTS.defaultValue);
+
+  const foundClues = computed<ClueId[]>(() => {
+    return Object.values(clueStates.value)
+      .filter(({ status }) => status === ClueStatus.Found)
+      .map(({ id }) => id);
+  });
+
+  const excludedClues = computed<ClueId[]>(() => {
+    return Object.values(clueStates.value)
+      .filter(({ status }) => status === ClueStatus.Excluded)
+      .map(({ id }) => id);
+  });
+
+  const possibleGhosts = computed(() => {
+    const {
+      isGuaranteedCluesNotExcluded,
+      isFoundOnlyRelevantClues,
+      isFoundCluesCountWithinLimit,
+      isExcludedCountWithinLimit,
+      isNotAtMaxCluesOrAllGuaranteedFound,
+      isEnoughSlotsForGuaranteedClues,
+    } = GhostFilteringService;
+
+    const excludedCluesSet = new Set(excludedClues.value);
+    const foundCluesSet = new Set(foundClues.value);
+    const currentDifficultyValue = currentDifficulty.value;
+
+    return new Set(
+      Object.values(ghostsData)
+        .filter(isGuaranteedCluesNotExcluded(excludedCluesSet))
+        .filter(isFoundOnlyRelevantClues(foundCluesSet))
+        .filter(isFoundCluesCountWithinLimit(foundCluesSet, currentDifficultyValue))
+        .filter(isExcludedCountWithinLimit(excludedCluesSet, currentDifficultyValue))
+        .filter(isNotAtMaxCluesOrAllGuaranteedFound(foundCluesSet, currentDifficultyValue))
+        .filter(isEnoughSlotsForGuaranteedClues(foundCluesSet, currentDifficultyValue))
+        .map(({ id }) => id)
+    );
+  });
 
   function resetClues(): void {
     clueStates.value = CLUE_STATES.defaultValue;
@@ -80,6 +121,9 @@ export function useAppSettings() {
     clueStates,
     selectedGhost,
     showAllGhosts,
+    foundClues,
+    excludedClues,
+    possibleGhosts,
     resetClues,
     updateSelectedGhost,
   };
