@@ -1,3 +1,4 @@
+import { getPossibleGhosts } from './get-possible-ghosts';
 import { isEnoughSlotsForGuaranteedClues } from './is-enough-slots-for-guaranteed-clues';
 import { isExcludedCountWithinLimit } from './is-excluded-clues-count-within-limit';
 import { isFoundCluesCountWithinLimit } from './is-found-clues-count-within-limit';
@@ -12,4 +13,5 @@ export const GhostFilteringService = {
   isFoundOnlyRelevantClues,
   isGuaranteedCluesNotExcluded,
   isNotAtMaxCluesOrAllGuaranteedFound,
+  getPossibleGhosts,
 };

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 const inputId = useId();
 
-const isChecked = defineModel<boolean>({ required: true });
+const store = useSettings();
 </script>
 
 <template>
@@ -12,7 +12,7 @@ const isChecked = defineModel<boolean>({ required: true });
     >
       <input
         :id="inputId"
-        v-model="isChecked"
+        v-model="store.showAllGhosts"
         class="toggle"
         type="checkbox"
       />

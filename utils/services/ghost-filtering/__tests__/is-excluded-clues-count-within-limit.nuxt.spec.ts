@@ -4,31 +4,34 @@ import { difficultyWithNoHiddenClues, difficultyWithOneHiddenClue, mockGhost } f
 
 describe('isExcludedCountWithinLimit', () => {
   it('Возвращает true, если количество исключенных улик призрака не превышает количество скрываемых улик', () => {
-    expect(isExcludedCountWithinLimit(new Set(), difficultyWithNoHiddenClues)(mockGhost)).toBe(
+    expect(isExcludedCountWithinLimit(mockGhost, new Set(), difficultyWithNoHiddenClues)).toBe(
       true
     );
 
     expect(
       isExcludedCountWithinLimit(
+        mockGhost,
         new Set([ClueId.Ultraviolet]),
         difficultyWithOneHiddenClue
-      )(mockGhost)
+      )
     ).toBe(true);
   });
 
   it('Возвращает false, если количество исключенных улик призрака превышает количество скрываемых улик', () => {
     expect(
       isExcludedCountWithinLimit(
+        mockGhost,
         new Set([ClueId.Ultraviolet]),
         difficultyWithNoHiddenClues
-      )(mockGhost)
+      )
     ).toBe(false);
 
     expect(
       isExcludedCountWithinLimit(
+        mockGhost,
         new Set([ClueId.Ultraviolet, ClueId.SpiritBox]),
         difficultyWithNoHiddenClues
-      )(mockGhost)
+      )
     ).toBe(false);
   });
 });

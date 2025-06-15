@@ -1,16 +1,7 @@
 <script setup lang="ts">
 import { GhostId } from '~/utils';
 
-defineProps<{
-  possibleGhosts: Set<GhostId>;
-  showAllGhosts: boolean;
-  selectedGhost: GhostId | null;
-}>();
-defineEmits<{
-  updateSelectedGhost: [newSelectedGhost: GhostId];
-}>();
-
-const ghostButtons: GhostId[] = [
+const ghostButtons = [
   GhostId.Spirit,
   GhostId.Wraith,
   GhostId.Phantom,
@@ -35,38 +26,39 @@ const ghostButtons: GhostId[] = [
   GhostId.Moroi,
   GhostId.Deogen,
   GhostId.Thaye,
-];
+] as const satisfies GhostId[];
+
+const store = useSettings();
 </script>
 
 <template>
   <div class="possible-ghosts">
     <h2 class="heading">Возможные призраки</h2>
-
     <TransitionGroup
       name="ghost-list"
       class="ghost-list"
       tag="ul"
     >
       <li
-        v-for="ghostId in showAllGhosts
+        v-for="ghostId in store.showAllGhosts
           ? ghostButtons
-          : ghostButtons.filter((ghost) => possibleGhosts.has(ghost))"
+          : ghostButtons.filter((ghostId) => store.possibleGhosts.has(ghostId))"
         :key="ghostId"
       >
         <button
           class="ghost-button"
-          @click="$emit('updateSelectedGhost', ghostId)"
+          @click="store.selectedGhostId = store.selectedGhostId === ghostId ? null : ghostId"
         >
           <span
             :class="[
               'ghost-label',
               {
-                impossible: !possibleGhosts.has(ghostId),
-                selected: selectedGhost === ghostId,
+                impossible: !store.possibleGhosts.has(ghostId),
+                selected: store.selectedGhostId === ghostId,
               },
             ]"
           >
-            {{ ghostsData[ghostId].label }}
+            {{ ghostsData.get(ghostId)?.label ?? ghostId }}
           </span>
         </button>
       </li>

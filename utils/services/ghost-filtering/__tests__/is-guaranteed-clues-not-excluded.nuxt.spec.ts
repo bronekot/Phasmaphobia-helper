@@ -4,14 +4,14 @@ import { mockGhost } from './utils';
 
 describe('isGuaranteedCluesNotExcluded', () => {
   it('Возвращает true, если исключенных улик нет', () => {
-    expect(isGuaranteedCluesNotExcluded(new Set())(mockGhost)).toBe(true);
+    expect(isGuaranteedCluesNotExcluded(mockGhost, new Set())).toBe(true);
   });
 
   it('Возвращает true, если гарантированных улик нет среди исключенных', () => {
-    expect(isGuaranteedCluesNotExcluded(new Set([ClueId.Ultraviolet]))(mockGhost)).toBe(true);
+    expect(isGuaranteedCluesNotExcluded(mockGhost, new Set([ClueId.Ultraviolet]))).toBe(true);
   });
 
   it('Возвращает false, если гарантированные улики есть среди исключенных', () => {
-    expect(isGuaranteedCluesNotExcluded(new Set([ClueId.GhostOrb]))(mockGhost)).toBe(false);
+    expect(isGuaranteedCluesNotExcluded(mockGhost, new Set([ClueId.GhostOrb]))).toBe(false);
   });
 });

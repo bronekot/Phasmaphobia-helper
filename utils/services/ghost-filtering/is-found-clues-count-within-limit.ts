@@ -5,8 +5,15 @@ import type { GameDifficultyId } from '~/utils/schemas/game-difficulty-id.schema
 
 /** Возвращает `true`, если количество найденных улик не превышает максимальное количество улик призрака с учетом скрываемых улик */
 export function isFoundCluesCountWithinLimit(
+  ghost: Ghost,
   foundClues: ReadonlySet<ClueId>,
   difficulty: GameDifficultyId
-): (ghost: Ghost) => boolean {
-  return (ghost) => foundClues.size <= ghost.clues.size - hiddenCluesCounts[difficulty].count;
+): boolean {
+  const hiddenCluesCount = hiddenCluesCounts.get(difficulty);
+
+  if (hiddenCluesCount === undefined) {
+    throw new Error(`Не найдено количество скрытых подсказок для сложности ${difficulty}!`);
+  }
+
+  return foundClues.size <= ghost.clues.size - hiddenCluesCount;
 }

@@ -1,38 +1,11 @@
-<script setup lang="ts">
-const {
-  currentDifficulty,
-  clueStates,
-  selectedGhost,
-  showAllGhosts,
-  foundClues,
-  excludedClues,
-  possibleGhosts,
-  resetClues,
-  updateSelectedGhost,
-} = useAppSettings();
-
-// TODO распихать куда надо
-void foundClues;
-void excludedClues;
-</script>
-
 <template>
   <div class="app">
     <h1 class="heading"> Phasmophobia Ghost Identifier </h1>
-    <DifficultySelector v-model="currentDifficulty" />
-    <ClueList
-      v-model="clueStates"
-      :selected-ghost="selectedGhost"
-      @reset-clues="resetClues"
-    />
-    <PossibleGhosts
-      :possible-ghosts="possibleGhosts"
-      :show-all-ghosts="showAllGhosts"
-      :selected-ghost="selectedGhost"
-      @update-selected-ghost="updateSelectedGhost"
-    />
-    <GhostDetails :selected-ghost="selectedGhost" />
-    <GhostsModeSwitcher v-model="showAllGhosts" />
+    <DifficultySelector />
+    <ClueList />
+    <PossibleGhosts />
+    <GhostDetails />
+    <GhostsModeSwitcher />
   </div>
   <footer class="footer">
     <span class="copyright"> © 2025 Phasmophobia Helper. Разработано TactiKot с ❤️ </span>

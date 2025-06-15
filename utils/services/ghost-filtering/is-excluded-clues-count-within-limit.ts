@@ -5,24 +5,27 @@ import type { GameDifficultyId } from '~/utils/schemas/game-difficulty-id.schema
 
 /** Возвращает `true`, если количество исключенных улик не превышает количество скрываемых улик */
 export function isExcludedCountWithinLimit(
+  ghost: Ghost,
   excludedClues: ReadonlySet<ClueId>,
   difficulty: GameDifficultyId
-): (ghost: Ghost) => boolean {
-  return (ghost) => {
-    const ghostClues = ghost.clues;
+): boolean {
+  const ghostClues = ghost.clues;
 
-    let allowedMatches = hiddenCluesCounts[difficulty].count;
+  let allowedMatches = hiddenCluesCounts.get(difficulty);
 
-    for (const excludedClue of excludedClues) {
-      if (ghostClues.has(excludedClue)) {
-        allowedMatches -= 1;
+  if (allowedMatches === undefined) {
+    throw new Error(`Не найдено количество скрытых подсказок для сложности ${difficulty}!`);
+  }
 
-        if (allowedMatches < 0) {
-          return false;
-        }
+  for (const excludedClue of excludedClues) {
+    if (ghostClues.has(excludedClue)) {
+      allowedMatches -= 1;
+
+      if (allowedMatches < 0) {
+        return false;
       }
     }
+  }
 
-    return true;
-  };
+  return true;
 }

@@ -4,14 +4,14 @@ import { mockGhost } from './utils';
 
 describe('isFoundOnlyRelevantClues', () => {
   it('Возвращает true, если найденных улик нет', () => {
-    expect(isFoundOnlyRelevantClues(new Set())(mockGhost)).toBe(true);
+    expect(isFoundOnlyRelevantClues(mockGhost, new Set())).toBe(true);
   });
 
   it('Возвращает true, если все найденные улики подходят призраку', () => {
-    expect(isFoundOnlyRelevantClues(new Set([ClueId.Ultraviolet]))(mockGhost)).toBe(true);
+    expect(isFoundOnlyRelevantClues(mockGhost, new Set([ClueId.Ultraviolet]))).toBe(true);
   });
 
   it('Возвращает false, если какие-либо найденные улики не подходят призраку', () => {
-    expect(isFoundOnlyRelevantClues(new Set([ClueId.EmfLevel5]))(mockGhost)).toBe(false);
+    expect(isFoundOnlyRelevantClues(mockGhost, new Set([ClueId.EmfLevel5]))).toBe(false);
   });
 });

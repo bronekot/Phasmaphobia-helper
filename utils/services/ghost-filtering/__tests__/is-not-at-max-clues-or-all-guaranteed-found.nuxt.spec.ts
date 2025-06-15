@@ -5,17 +5,18 @@ import { difficultyWithNoHiddenClues, difficultyWithOneHiddenClue, mockGhost } f
 describe('isNotAtMaxCluesOrAllGuaranteedFound', () => {
   it('Возвращает true, если нет найденных улик', () => {
     expect(
-      isNotAtMaxCluesOrAllGuaranteedFound(new Set(), difficultyWithNoHiddenClues)(mockGhost)
+      isNotAtMaxCluesOrAllGuaranteedFound(mockGhost, new Set(), difficultyWithNoHiddenClues)
     ).toBe(true);
 
     expect(
-      isNotAtMaxCluesOrAllGuaranteedFound(new Set(), difficultyWithOneHiddenClue)(mockGhost)
+      isNotAtMaxCluesOrAllGuaranteedFound(mockGhost, new Set(), difficultyWithOneHiddenClue)
     ).toBe(true);
   });
 
   it('Возвращает true, если найдено максимум улик и найдены все гарантированные улики', () => {
     expect(
       isNotAtMaxCluesOrAllGuaranteedFound(
+        mockGhost,
         new Set([
           ClueId.DisturbedSaltPile,
           ClueId.FreezingTemperatures,
@@ -24,11 +25,12 @@ describe('isNotAtMaxCluesOrAllGuaranteedFound', () => {
           ClueId.Ultraviolet,
         ]),
         difficultyWithNoHiddenClues
-      )(mockGhost)
+      )
     ).toBe(true);
 
     expect(
       isNotAtMaxCluesOrAllGuaranteedFound(
+        mockGhost,
         new Set([
           ClueId.DisturbedSaltPile,
           ClueId.FreezingTemperatures,
@@ -36,13 +38,14 @@ describe('isNotAtMaxCluesOrAllGuaranteedFound', () => {
           ClueId.SpiritBox,
         ]),
         difficultyWithOneHiddenClue
-      )(mockGhost)
+      )
     ).toBe(true);
   });
 
   it('Возвращает false, если найдено максимум улик, и найдены не все гарантированные улики', () => {
     expect(
       isNotAtMaxCluesOrAllGuaranteedFound(
+        mockGhost,
         new Set([
           ClueId.DotsProjector,
           ClueId.FreezingTemperatures,
@@ -51,11 +54,12 @@ describe('isNotAtMaxCluesOrAllGuaranteedFound', () => {
           ClueId.Ultraviolet,
         ]),
         difficultyWithNoHiddenClues
-      )(mockGhost)
+      )
     ).toBe(false);
 
     expect(
       isNotAtMaxCluesOrAllGuaranteedFound(
+        mockGhost,
         new Set([
           ClueId.FreezingTemperatures,
           ClueId.GhostOrb,
@@ -63,13 +67,14 @@ describe('isNotAtMaxCluesOrAllGuaranteedFound', () => {
           ClueId.Ultraviolet,
         ]),
         difficultyWithOneHiddenClue
-      )(mockGhost)
+      )
     ).toBe(false);
   });
 
   it('Возвращает false, если найдено максимум улик, и не найдено гарантированных улик', () => {
     expect(
       isNotAtMaxCluesOrAllGuaranteedFound(
+        mockGhost,
         new Set([
           ClueId.DotsProjector,
           ClueId.FreezingTemperatures,
@@ -78,11 +83,12 @@ describe('isNotAtMaxCluesOrAllGuaranteedFound', () => {
           ClueId.Ultraviolet,
         ]),
         difficultyWithNoHiddenClues
-      )(mockGhost)
+      )
     ).toBe(false);
 
     expect(
       isNotAtMaxCluesOrAllGuaranteedFound(
+        mockGhost,
         new Set([
           ClueId.DotsProjector,
           ClueId.FreezingTemperatures,
@@ -90,7 +96,7 @@ describe('isNotAtMaxCluesOrAllGuaranteedFound', () => {
           ClueId.Ultraviolet,
         ]),
         difficultyWithOneHiddenClue
-      )(mockGhost)
+      )
     ).toBe(false);
   });
 });

@@ -1,16 +1,7 @@
 <script setup lang="ts">
 import { GameDifficultyId } from '~/utils';
 
-const currentDifficulty = defineModel<GameDifficultyId>();
-
-interface DifficultyItem {
-  id: GameDifficultyId;
-  icon: string;
-  borderColor: string;
-  backgroundColor: string;
-}
-
-const difficultyItems: DifficultyItem[] = [
+const difficultyItems = [
   {
     id: GameDifficultyId.Amateur,
     icon: 'fa6-solid:baby',
@@ -41,9 +32,16 @@ const difficultyItems: DifficultyItem[] = [
     borderColor: '#9c27b0',
     backgroundColor: '#3a233e',
   },
-];
+] as const satisfies Array<{
+  id: GameDifficultyId;
+  icon: string;
+  borderColor: string;
+  backgroundColor: string;
+}>;
 
 const formId = useId();
+
+const store = useSettings();
 </script>
 
 <template>
@@ -60,7 +58,7 @@ const formId = useId();
       >
         <input
           :id="`${formId}-${difficulty.id}`"
-          v-model="currentDifficulty"
+          v-model="store.currentDifficulty"
           class="difficulty-input sr-only"
           type="radio"
           name="difficulty"
@@ -79,7 +77,7 @@ const formId = useId();
             :name="difficulty.icon"
           />
           <span>
-            {{ gameDifficultiesData[difficulty.id].label }}
+            {{ gameDifficultiesData.get(difficulty.id) ?? difficulty.id }}
           </span>
         </label>
       </template>

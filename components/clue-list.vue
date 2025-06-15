@@ -1,15 +1,7 @@
 <script setup lang="ts">
-import { ClueId, ClueStatus, type GhostId } from '~/utils';
+import { ClueId, ClueStatus } from '~/utils';
 
-defineModel<Record<ClueId, { id: ClueId; status: ClueStatus }>>({ required: true });
-defineProps<{
-  selectedGhost: GhostId | null;
-}>();
-defineEmits<{
-  resetClues: [];
-}>();
-
-const clueItems = ref<ClueId[]>([
+const clueItems = [
   ClueId.EmfLevel5,
   ClueId.Ultraviolet,
   ClueId.GhostWriting,
@@ -18,15 +10,17 @@ const clueItems = ref<ClueId[]>([
   ClueId.GhostOrb,
   ClueId.SpiritBox,
   ClueId.DisturbedSaltPile,
-]);
+] as const satisfies ClueId[];
 
 const clueItemButtons = [
   { id: ClueStatus.Found, icon: 'fa6-solid:check', label: 'Подтвердить' },
   { id: ClueStatus.Null, icon: 'fa6-solid:arrow-rotate-left', label: 'Сбросить' },
   { id: ClueStatus.Excluded, icon: 'fa6-solid:xmark', label: 'Вычеркнуть' },
-];
+] as const satisfies Array<{ id: ClueStatus; icon: string; label: string }>;
 
 const formId = useId();
+
+const store = useSettings();
 </script>
 
 <template>
@@ -39,7 +33,7 @@ const formId = useId();
       <button
         class="reset-button"
         aria-label="Сбросить всё"
-        @click="$emit('resetClues')"
+        @click="store.resetClues"
       >
         <Icon name="fa6-solid:arrows-rotate" />
       </button>
@@ -51,15 +45,18 @@ const formId = useId();
         :class="[
           'clue',
           {
-            'positive': modelValue[clueId].status === ClueStatus.Found,
-            'negative': modelValue[clueId].status === ClueStatus.Excluded,
-            'inactive': false /* !isClueRelevant(clue) && clueStates[clue] !== 'found' && clueStates[clue] !== 'excluded' */,
-            'highlighted-by-ghost': selectedGhost && ghostsData[selectedGhost].clues.has(clueId),
+            'positive': store.clueStates[clueId].status === ClueStatus.Found,
+            'negative': store.clueStates[clueId].status === ClueStatus.Excluded,
+            'inactive':
+              store.clueStates[clueId].status === ClueStatus.Null &&
+              false /* TODO isClueRelevant(clueId) */,
+            'highlighted-by-ghost':
+              store.selectedGhostId && ghostsData.get(store.selectedGhostId)?.clues.has(clueId),
           },
         ]"
       >
         <legend class="clue-label">
-          {{ cluesData[clueId].label }}
+          {{ cluesData.get(clueId) ?? clueId }}
         </legend>
         <template
           v-for="button in clueItemButtons"
@@ -67,7 +64,7 @@ const formId = useId();
         >
           <input
             :id="`${formId}-${clueId}-${button.id}`"
-            v-model="modelValue[clueId].status"
+            v-model="store.clueStates[clueId].status"
             type="radio"
             class="clue-button-input sr-only"
             :name="`${formId}-${clueId}`"
@@ -246,6 +243,10 @@ const formId = useId();
   @include breakpoint-xs {
     font-size: var(--text-base);
   }
+}
+
+.clue.inactive .clue-label {
+  opacity: 0.5;
 }
 
 .clue-button-label {

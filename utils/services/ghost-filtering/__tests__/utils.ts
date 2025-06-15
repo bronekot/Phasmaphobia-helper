@@ -10,7 +10,6 @@ import { ClueId } from '~/utils/schemas/clue-id.schema';
  * Гарантированные призраки: DisturbedSaltPile, GhostOrb
  */
 export const mockGhost: Ghost = {
-  id: 'TheMimic',
   label: 'Мимик',
   description: 'Это моковый мимик',
   clues: new Set([
@@ -24,9 +23,9 @@ export const mockGhost: Ghost = {
 };
 
 export const difficultyWithNoHiddenClues = (() => {
-  for (const difficulty of Object.values(hiddenCluesCounts)) {
-    if (difficulty.count === 0) {
-      return difficulty.id;
+  for (const [difficulty, count] of hiddenCluesCounts) {
+    if (count === 0) {
+      return difficulty;
     }
   }
 
@@ -34,9 +33,9 @@ export const difficultyWithNoHiddenClues = (() => {
 })();
 
 export const difficultyWithOneHiddenClue = (() => {
-  for (const difficulty of Object.values(hiddenCluesCounts)) {
-    if (difficulty.count === 1) {
-      return difficulty.id;
+  for (const [difficulty, count] of hiddenCluesCounts) {
+    if (count === 1) {
+      return difficulty;
     }
   }
 

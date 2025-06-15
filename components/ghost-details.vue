@@ -1,7 +1,5 @@
 <script setup lang="ts">
-import type { GhostId } from '~/utils';
-
-const { selectedGhost } = defineProps<{ selectedGhost: GhostId | null }>();
+const store = useSettings();
 </script>
 
 <template>
@@ -10,20 +8,24 @@ const { selectedGhost } = defineProps<{ selectedGhost: GhostId | null }>();
     mode="out-in"
   >
     <div
-      v-if="selectedGhost"
-      :key="selectedGhost"
+      v-if="store.selectedGhostId !== null && ghostsData.has(store.selectedGhostId)"
+      :key="store.selectedGhostId"
       class="ghost-details"
     >
-      <h2 class="heading"> {{ ghostsData[selectedGhost].label }} </h2>
-      <p class="description"> {{ ghostsData[selectedGhost].description }} </p>
+      <h2 class="heading">
+        {{ ghostsData.get(store.selectedGhostId)?.label }}
+      </h2>
+      <p class="description">
+        {{ ghostsData.get(store.selectedGhostId)?.description }}
+      </p>
       <h3 class="subheading">Улики:</h3>
       <ul class="clues">
         <li
-          v-for="clue in ghostsData[selectedGhost].clues"
-          :key="clue"
+          v-for="clueId in ghostsData.get(store.selectedGhostId)?.clues"
+          :key="clueId"
           class="clue"
         >
-          {{ cluesData[clue].label }}
+          {{ cluesData.get(clueId) ?? clueId }}
         </li>
       </ul>
     </div>

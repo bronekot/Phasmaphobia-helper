@@ -4,11 +4,11 @@ import { difficultyWithNoHiddenClues, difficultyWithOneHiddenClue, mockGhost } f
 
 describe('isFoundCluesCountWithinLimit', () => {
   it('Возвращает true, если нет найденных улик', () => {
-    expect(isFoundCluesCountWithinLimit(new Set(), difficultyWithNoHiddenClues)(mockGhost)).toBe(
+    expect(isFoundCluesCountWithinLimit(mockGhost, new Set(), difficultyWithNoHiddenClues)).toBe(
       true
     );
 
-    expect(isFoundCluesCountWithinLimit(new Set(), difficultyWithOneHiddenClue)(mockGhost)).toBe(
+    expect(isFoundCluesCountWithinLimit(mockGhost, new Set(), difficultyWithOneHiddenClue)).toBe(
       true
     );
   });
@@ -16,6 +16,7 @@ describe('isFoundCluesCountWithinLimit', () => {
   it('Возвращает true, если количество найденных улик не превышает максимальное количество улик призрака', () => {
     expect(
       isFoundCluesCountWithinLimit(
+        mockGhost,
         new Set([
           ClueId.DisturbedSaltPile,
           ClueId.FreezingTemperatures,
@@ -24,11 +25,12 @@ describe('isFoundCluesCountWithinLimit', () => {
           ClueId.Ultraviolet,
         ]),
         difficultyWithNoHiddenClues
-      )(mockGhost)
+      )
     ).toBe(true);
 
     expect(
       isFoundCluesCountWithinLimit(
+        mockGhost,
         new Set([
           ClueId.DisturbedSaltPile,
           ClueId.FreezingTemperatures,
@@ -36,13 +38,14 @@ describe('isFoundCluesCountWithinLimit', () => {
           ClueId.SpiritBox,
         ]),
         difficultyWithOneHiddenClue
-      )(mockGhost)
+      )
     ).toBe(true);
   });
 
   it('Возвращает false, если количество найденных улик превышает максимальное количество улик призрака', () => {
     expect(
       isFoundCluesCountWithinLimit(
+        mockGhost,
         new Set([
           ClueId.DisturbedSaltPile,
           ClueId.FreezingTemperatures,
@@ -51,7 +54,7 @@ describe('isFoundCluesCountWithinLimit', () => {
           ClueId.Ultraviolet,
         ]),
         difficultyWithOneHiddenClue
-      )(mockGhost)
+      )
     ).toBe(false);
   });
 });
