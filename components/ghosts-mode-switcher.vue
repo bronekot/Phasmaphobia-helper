@@ -6,31 +6,25 @@ const isChecked = defineModel<boolean>({ required: true });
 
 <template>
   <div class="ghosts-mode-switcher">
-    <input
-      :id="inputId"
-      v-model="isChecked"
-      class="toggle"
-      type="checkbox"
-    />
     <label
       :for="inputId"
       class="label"
     >
-      Показывать всех призраков (затенять отфильтрованных)
+      <input
+        :id="inputId"
+        v-model="isChecked"
+        class="toggle"
+        type="checkbox"
+      />
+      <span class="label-text"> Показывать всех призраков (затенять отфильтрованных)</span>
     </label>
   </div>
 </template>
 
 <style scoped lang="scss">
 .ghosts-mode-switcher {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  align-items: center;
-  justify-content: center;
-
   width: 100%;
-  padding: 1rem 0.3125rem;
+  padding: 8px 0;
   border-radius: 0.25rem;
 }
 
@@ -91,6 +85,23 @@ const isChecked = defineModel<boolean>({ required: true });
 
 .label {
   cursor: pointer;
+
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+  justify-content: center;
+
+  width: fit-content;
+  margin-inline: auto;
+  padding: 0.3125rem;
+
+  @include breakpoint-xs {
+    padding: 0.5rem;
+  }
+}
+
+.label-text {
   user-select: none;
   font-size: var(--text-xs);
   line-height: 1;
