@@ -112,6 +112,7 @@ export const useSettings = defineStore(
     persist: {
       storage: localStorage,
       pick: ['currentDifficulty', 'showAllGhosts'],
+      key: '[phasmophobia-ghost-identifier]settings',
     },
   }
 );
