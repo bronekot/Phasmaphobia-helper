@@ -45,10 +45,10 @@ const store = useSettings();
         :class="[
           'clue',
           {
-            'positive': store.clueStates[clueId].status === ClueStatus.Found,
-            'negative': store.clueStates[clueId].status === ClueStatus.Excluded,
+            'positive': store.clueStates[clueId] === ClueStatus.Found,
+            'negative': store.clueStates[clueId] === ClueStatus.Excluded,
             'inactive':
-              store.clueStates[clueId].status === ClueStatus.Null &&
+              store.clueStates[clueId] === ClueStatus.Null &&
               false /* TODO isClueRelevant(clueId) */,
             'highlighted-by-ghost':
               store.selectedGhostId && ghostsData.get(store.selectedGhostId)?.clues.has(clueId),
@@ -64,7 +64,7 @@ const store = useSettings();
         >
           <input
             :id="`${formId}-${clueId}-${button.id}`"
-            v-model="store.clueStates[clueId].status"
+            v-model="store.clueStates[clueId]"
             type="radio"
             class="clue-button-input sr-only"
             :name="`${formId}-${clueId}`"

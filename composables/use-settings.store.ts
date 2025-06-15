@@ -1,47 +1,29 @@
 import { defineStore } from 'pinia';
 import { ClueId, ClueStatus, GameDifficultyId, type GhostId } from '~/utils';
 
-interface ClueState {
-  id: ClueId;
-  status: ClueStatus;
-}
-
-const defaultCurrentDifficulty = GameDifficultyId.Amateur;
+const clueStateKeys = new Set<ClueId>([
+  ClueId.EmfLevel5,
+  ClueId.Ultraviolet,
+  ClueId.GhostWriting,
+  ClueId.FreezingTemperatures,
+  ClueId.DotsProjector,
+  ClueId.GhostOrb,
+  ClueId.SpiritBox,
+  ClueId.DisturbedSaltPile,
+]);
 
 const defaultClueStates = {
-  [ClueId.EmfLevel5]: {
-    id: ClueId.EmfLevel5,
-    status: ClueStatus.Null,
-  },
-  [ClueId.Ultraviolet]: {
-    id: ClueId.Ultraviolet,
-    status: ClueStatus.Null,
-  },
-  [ClueId.GhostWriting]: {
-    id: ClueId.GhostWriting,
-    status: ClueStatus.Null,
-  },
-  [ClueId.FreezingTemperatures]: {
-    id: ClueId.FreezingTemperatures,
-    status: ClueStatus.Null,
-  },
-  [ClueId.DotsProjector]: {
-    id: ClueId.DotsProjector,
-    status: ClueStatus.Null,
-  },
-  [ClueId.GhostOrb]: {
-    id: ClueId.GhostOrb,
-    status: ClueStatus.Null,
-  },
-  [ClueId.SpiritBox]: {
-    id: ClueId.SpiritBox,
-    status: ClueStatus.Null,
-  },
-  [ClueId.DisturbedSaltPile]: {
-    id: ClueId.DisturbedSaltPile,
-    status: ClueStatus.Null,
-  },
-} as const satisfies Record<ClueId, ClueState>;
+  [ClueId.EmfLevel5]: ClueStatus.Null,
+  [ClueId.Ultraviolet]: ClueStatus.Null,
+  [ClueId.GhostWriting]: ClueStatus.Null,
+  [ClueId.FreezingTemperatures]: ClueStatus.Null,
+  [ClueId.DotsProjector]: ClueStatus.Null,
+  [ClueId.GhostOrb]: ClueStatus.Null,
+  [ClueId.SpiritBox]: ClueStatus.Null,
+  [ClueId.DisturbedSaltPile]: ClueStatus.Null,
+} as const satisfies Record<ClueId, ClueStatus>;
+
+const defaultCurrentDifficulty = GameDifficultyId.Amateur;
 
 const defaultSelectedGhostId = null;
 
@@ -50,32 +32,36 @@ const defaultShowAllGhosts = true;
 export const useSettings = defineStore(
   'app-settings',
   () => {
-    const currentDifficulty = ref<GameDifficultyId>(defaultCurrentDifficulty);
+    const clueStates = ref<Record<ClueId, ClueStatus>>({ ...defaultClueStates });
 
-    const clueStates = ref<Record<ClueId, ClueState>>(structuredClone(defaultClueStates));
+    const currentDifficulty = ref<GameDifficultyId>(defaultCurrentDifficulty);
 
     const selectedGhostId = ref<GhostId | null>(defaultSelectedGhostId);
 
     const showAllGhosts = ref<boolean>(defaultShowAllGhosts);
 
     const excludedClues = computed(() => {
-      return Object.values(clueStates.value).reduce((set, { id, status }) => {
-        if (status === ClueStatus.Excluded) {
+      const set = new Set<ClueId>();
+
+      for (const id of clueStateKeys) {
+        if (clueStates.value[id] === ClueStatus.Excluded) {
           set.add(id);
         }
+      }
 
-        return set;
-      }, new Set<ClueId>());
+      return set;
     });
 
     const foundClues = computed(() => {
-      return Object.values(clueStates.value).reduce((set, { id, status }) => {
-        if (status === ClueStatus.Found) {
+      const set = new Set<ClueId>();
+
+      for (const id of clueStateKeys) {
+        if (clueStates.value[id] === ClueStatus.Found) {
           set.add(id);
         }
+      }
 
-        return set;
-      }, new Set<ClueId>());
+      return set;
     });
 
     const possibleGhosts = computed(() => {
@@ -87,7 +73,7 @@ export const useSettings = defineStore(
     });
 
     function resetClues() {
-      clueStates.value = structuredClone(defaultClueStates);
+      clueStates.value = { ...defaultClueStates };
     }
 
     function updateSelectedGhost(newSelectedGhost: GhostId): void {
@@ -95,8 +81,8 @@ export const useSettings = defineStore(
     }
 
     return {
-      currentDifficulty,
       clueStates,
+      currentDifficulty,
       selectedGhostId,
       showAllGhosts,
 
