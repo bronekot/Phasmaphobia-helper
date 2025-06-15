@@ -22,6 +22,7 @@ void excludedClues;
     <DifficultySelector v-model="currentDifficulty" />
     <ClueList
       v-model="clueStates"
+      :selected-ghost="selectedGhost"
       @reset-clues="resetClues"
     />
     <PossibleGhosts

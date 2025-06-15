@@ -1,7 +1,10 @@
 <script setup lang="ts">
-import { ClueId, ClueStatus } from '~/utils';
+import { ClueId, ClueStatus, type GhostId } from '~/utils';
 
 defineModel<Record<ClueId, { id: ClueId; status: ClueStatus }>>({ required: true });
+defineProps<{
+  selectedGhost: GhostId | null;
+}>();
 defineEmits<{
   resetClues: [];
 }>();
@@ -48,10 +51,10 @@ const formId = useId();
         :class="[
           'clue',
           {
-            positive: modelValue[clueId].status === ClueStatus.Found,
-            negative: modelValue[clueId].status === ClueStatus.Excluded,
-            inactive: false,
-            highlightedByGhost: false,
+            'positive': modelValue[clueId].status === ClueStatus.Found,
+            'negative': modelValue[clueId].status === ClueStatus.Excluded,
+            'inactive': false /* !isClueRelevant(clue) && clueStates[clue] !== 'found' && clueStates[clue] !== 'excluded' */,
+            'highlighted-by-ghost': selectedGhost && ghostsData[selectedGhost].clues.has(clueId),
           },
         ]"
       >
@@ -209,7 +212,13 @@ const formId = useId();
   padding: 0.375rem 0.5rem;
   border: unset;
 
-  transition: background-color 0.3s ease;
+  transition:
+    background-color 0.3s ease,
+    box-shadow 0.3s ease;
+
+  &.highlighted-by-ghost {
+    box-shadow: inset 0 0 0.125rem 0.125rem #ffd700;
+  }
 
   &:not(:last-child) {
     border-bottom: 0.0625rem solid #444;

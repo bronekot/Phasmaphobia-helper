@@ -126,13 +126,13 @@ const ghostButtons: GhostId[] = [
   .ghost-list-enter-active,
   .ghost-list-leave-active {
     transition:
-      transform 0.5s ease,
-      opacity 0.5s ease;
+      transform 0.3s ease,
+      opacity 0.3s ease;
   }
 
   .ghost-list-enter-from,
   .ghost-list-leave-to {
-    transform: translateX(30px);
+    transform: translateX(1.875rem);
     opacity: 0;
   }
 
