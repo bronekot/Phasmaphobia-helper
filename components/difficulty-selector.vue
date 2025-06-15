@@ -185,7 +185,7 @@ const formId = useId();
 
   &:focus-visible + .difficulty-label {
     outline: 0.0625rem auto #101010;
-    outline-offset: 2px;
+    outline-offset: 0.125rem;
   }
 }
 

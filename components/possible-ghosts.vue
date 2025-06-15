@@ -36,29 +36,41 @@ const ghostButtons: GhostId[] = [
   GhostId.Deogen,
   GhostId.Thaye,
 ];
-
-// TODO настроить отображение возможных призраков
 </script>
 
 <template>
   <div class="possible-ghosts">
-    <div>
-      <div> showAllGhosts: {{ showAllGhosts }} </div>
-      <div> possibleGhosts: {{ possibleGhosts }} </div>
-    </div>
     <h2 class="heading">Возможные призраки</h2>
-    <div class="list">
-      <button
-        v-for="ghostId in ghostButtons"
+
+    <TransitionGroup
+      name="ghost-list"
+      class="ghost-list"
+      tag="ul"
+    >
+      <li
+        v-for="ghostId in showAllGhosts
+          ? ghostButtons
+          : ghostButtons.filter((ghost) => possibleGhosts.has(ghost))"
         :key="ghostId"
-        class="ghost-button"
-        @click="$emit('updateSelectedGhost', ghostId)"
       >
-        <span :class="['ghost-label', { selected: selectedGhost === ghostId }]">
-          {{ ghostsData[ghostId].label }}
-        </span>
-      </button>
-    </div>
+        <button
+          class="ghost-button"
+          @click="$emit('updateSelectedGhost', ghostId)"
+        >
+          <span
+            :class="[
+              'ghost-label',
+              {
+                impossible: !possibleGhosts.has(ghostId),
+                selected: selectedGhost === ghostId,
+              },
+            ]"
+          >
+            {{ ghostsData[ghostId].label }}
+          </span>
+        </button>
+      </li>
+    </TransitionGroup>
   </div>
 </template>
 
@@ -97,10 +109,39 @@ const ghostButtons: GhostId[] = [
   }
 }
 
-.list {
+.ghost-list {
+  position: relative;
+
+  overflow: hidden;
   display: grid;
   grid-template-columns: repeat(3, 1fr);
+
   width: 100%;
+  margin-block: 0;
+  padding-inline-start: 0;
+
+  list-style: none;
+
+  .ghost-list-move,
+  .ghost-list-enter-active,
+  .ghost-list-leave-active {
+    transition:
+      transform 0.5s ease,
+      opacity 0.5s ease;
+  }
+
+  .ghost-list-enter-from,
+  .ghost-list-leave-to {
+    transform: translateX(30px);
+    opacity: 0;
+  }
+
+  .ghost-list-leave-active {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
 }
 
 .ghost-button {
@@ -108,6 +149,8 @@ const ghostButtons: GhostId[] = [
   align-items: center;
   justify-content: center;
 
+  width: 100%;
+  height: 100%;
   padding: 0.9375rem 0.1875rem;
   border: unset;
 
@@ -130,7 +173,13 @@ const ghostButtons: GhostId[] = [
   font-size: var(--text-base);
   line-height: 1;
   color: #f0f0f0;
-  transition: color 0.3s;
+  transition:
+    color 0.3s,
+    opacity 0.3s;
+
+  &.impossible {
+    opacity: 0.5;
+  }
 
   &.selected {
     font-weight: 700;
