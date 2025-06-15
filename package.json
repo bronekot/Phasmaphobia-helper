@@ -16,9 +16,9 @@
   "scripts": {
     "test": "vitest run",
     "cleanup": "nuxt cleanup",
-    "build": "nuxt cleanup && nuxt build",
+    "build": "nuxt build",
     "build:static": "nuxt cleanup && nuxt build --preset=static",
-    "dev": "nuxt cleanup && nuxt dev",
+    "dev": "nuxt dev",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
