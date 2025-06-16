@@ -40,7 +40,7 @@ export const useSettings = defineStore(
 
     const showAllGhosts = ref<boolean>(defaultShowAllGhosts);
 
-    const excludedClues = computed(() => {
+    const excludedClues = computed<ReadonlySet<ClueId>>(() => {
       const set = new Set<ClueId>();
 
       for (const id of clueStateKeys) {
@@ -52,7 +52,7 @@ export const useSettings = defineStore(
       return set;
     });
 
-    const foundClues = computed(() => {
+    const foundClues = computed<ReadonlySet<ClueId>>(() => {
       const set = new Set<ClueId>();
 
       for (const id of clueStateKeys) {
@@ -64,7 +64,7 @@ export const useSettings = defineStore(
       return set;
     });
 
-    const possibleGhosts = computed(() => {
+    const possibleGhosts = computed<ReadonlySet<GhostId>>(() => {
       return GhostFilteringService.getPossibleGhosts(
         excludedClues.value,
         foundClues.value,
@@ -72,12 +72,34 @@ export const useSettings = defineStore(
       );
     });
 
-    function resetClues() {
+    function resetClues(): void {
       clueStates.value = { ...defaultClueStates };
     }
 
     function updateSelectedGhost(newSelectedGhost: GhostId): void {
       selectedGhostId.value = selectedGhostId.value !== newSelectedGhost ? newSelectedGhost : null;
+    }
+
+    function isClueRelevant(clue: ClueId): boolean {
+      if (clueStates.value[clue] !== ClueStatus.Null) {
+        return true;
+      }
+
+      const possibleGhostsCount = possibleGhosts.value.size;
+
+      if (possibleGhostsCount <= 1) {
+        return false;
+      }
+
+      const hypotheticalPossibleGhostsCount = GhostFilteringService.getPossibleGhosts(
+        excludedClues.value,
+        new Set(foundClues.value).add(clue),
+        currentDifficulty.value
+      ).size;
+
+      return (
+        hypotheticalPossibleGhostsCount > 0 && hypotheticalPossibleGhostsCount < possibleGhostsCount
+      );
     }
 
     return {
@@ -92,6 +114,7 @@ export const useSettings = defineStore(
 
       resetClues,
       updateSelectedGhost,
+      isClueRelevant,
     };
   },
   {

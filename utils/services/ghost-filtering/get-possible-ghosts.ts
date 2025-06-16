@@ -3,10 +3,10 @@ import type { GameDifficultyId } from '~/utils/schemas/game-difficulty-id.schema
 import type { GhostId } from '~/utils/types/ghost-id.enum';
 
 export function getPossibleGhosts(
-  excludedClues: Set<ClueId>,
-  foundClues: Set<ClueId>,
+  excludedClues: ReadonlySet<ClueId>,
+  foundClues: ReadonlySet<ClueId>,
   currentDifficulty: GameDifficultyId
-): Set<GhostId> {
+): ReadonlySet<GhostId> {
   const {
     isGuaranteedCluesNotExcluded,
     isFoundOnlyRelevantClues,

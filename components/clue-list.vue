@@ -47,9 +47,7 @@ const store = useSettings();
           {
             'positive': store.clueStates[clueId] === ClueStatus.Found,
             'negative': store.clueStates[clueId] === ClueStatus.Excluded,
-            'inactive':
-              store.clueStates[clueId] === ClueStatus.Null &&
-              false /* TODO isClueRelevant(clueId) */,
+            'inactive': !store.isClueRelevant(clueId),
             'highlighted-by-ghost':
               store.selectedGhostId && ghostsData.get(store.selectedGhostId)?.clues.has(clueId),
           },
