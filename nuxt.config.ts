@@ -9,6 +9,7 @@ export default defineNuxtConfig({
     '@nuxt/eslint',
     '@pinia/nuxt',
     'pinia-plugin-persistedstate/nuxt',
+    'nuxt-single-html',
   ],
   app: {
     head: {
@@ -20,7 +21,7 @@ export default defineNuxtConfig({
         {
           rel: 'icon',
           type: 'image/png',
-          href: '/favicon.png',
+          href: 'https://static-cdn.jtvnw.net/jtv_user_pictures/369406b8-1c3e-40e3-a0e7-a91db98b9cdb-profile_image-70x70.png',
         },
       ],
       meta: [
