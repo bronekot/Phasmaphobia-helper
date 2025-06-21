@@ -1,0 +1,30 @@
+import type { ValueOf } from './value-of';
+
+export const GhostId = {
+  Spirit: 'Spirit',
+  Wraith: 'Wraith',
+  Phantom: 'Phantom',
+  Poltergeist: 'Poltergeist',
+  Banshee: 'Banshee',
+  Jinn: 'Jinn',
+  Mare: 'Mare',
+  Revenant: 'Revenant',
+  Shade: 'Shade',
+  Demon: 'Demon',
+  Yurei: 'Yurei',
+  Oni: 'Oni',
+  Yokai: 'Yokai',
+  Hantu: 'Hantu',
+  Goryo: 'Goryo',
+  Myling: 'Myling',
+  Onryo: 'Onryo',
+  TheTwins: 'TheTwins',
+  Raiju: 'Raiju',
+  Obake: 'Obake',
+  TheMimic: 'TheMimic',
+  Moroi: 'Moroi',
+  Deogen: 'Deogen',
+  Thaye: 'Thaye',
+} as const;
+
+export type GhostId = ValueOf<typeof GhostId>;
