@@ -1,4 +1,4 @@
-import { ClueId } from '~/utils/types/clue-id.enum';
+import { ClueId } from '~/utils/schemas/clue-id.schema';
 import { GhostId } from '~/utils/types/ghost-id.enum';
 
 export interface Ghost {

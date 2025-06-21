@@ -1,4 +1,4 @@
-import { ClueId } from '~/utils/types/clue-id.enum';
+import { ClueId } from '~/utils/schemas/clue-id.schema';
 
 export const cluesData: ReadonlyMap<ClueId, string> = new Map([
   [ClueId.EmfLevel5, 'ЭМП 5 уровня'],

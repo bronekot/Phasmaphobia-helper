@@ -80,7 +80,7 @@ const store = useSettings();
   margin-block: 0;
   padding: 0.25rem;
   font-size: var(--text-xs);
-  line-height: 1.2;
+  line-height: 1.6;
 
   @include breakpoint-xs {
     font-size: var(--text-sm);
