@@ -27,11 +27,11 @@ export default defineNuxtConfig({
       meta: [
         {
           name: 'description',
-          content: 'Phasmophobia Helper - A Vue.js application to identify ghosts based on clues.',
+          content: 'Phasmophobia Helper - A Nuxt application to identify ghosts based on clues.',
         },
         {
           name: 'keywords',
-          content: 'Phasmophobia, Ghost Helper, Vue.js, Clues, Ghost Identification',
+          content: 'Phasmophobia, Ghost Helper, Nuxt, Clues, Ghost Identification',
         },
         {
           name: 'author',
