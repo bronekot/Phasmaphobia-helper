@@ -15,7 +15,7 @@ export default defineNuxtConfig({
     head: {
       title: 'Phasmophobia Helper',
       htmlAttrs: {
-        lang: 'en',
+        lang: 'ru',
       },
       link: [
         {
