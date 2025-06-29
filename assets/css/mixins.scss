@@ -1,0 +1,29 @@
+$breakpoint-xs: 32rem;
+$breakpoint-sm: 40rem;
+$breakpoint-md: 48rem;
+
+@mixin hover {
+  @media (hover: hover) and (pointer: fine) {
+    &:hover {
+      @content;
+    }
+  }
+}
+
+@mixin breakpoint-xs {
+  @media (width >= $breakpoint-xs) {
+    @content;
+  }
+}
+
+@mixin breakpoint-sm {
+  @media (width >= $breakpoint-sm) {
+    @content;
+  }
+}
+
+@mixin breakpoint-md {
+  @media (width >= $breakpoint-md) {
+    @content;
+  }
+}
