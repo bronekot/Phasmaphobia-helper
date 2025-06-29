@@ -1,49 +1,68 @@
 <script setup lang="ts">
-const selectedGhost = ref<GhostId | null>(null);
+import { GhostId } from '~/utils';
 
-const ghosts = [
-  { id: 'spirit', label: 'Дух' },
-  { id: 'wraith', label: 'Мираж' },
-  { id: 'phantom', label: 'Фантом' },
-  { id: 'poltergeist', label: 'Полтергейст' },
-  { id: 'banshee', label: 'Банши' },
-  { id: 'jinn', label: 'Джинн' },
-  { id: 'mare', label: 'Мара' },
-  { id: 'revenant', label: 'Ревенант' },
-  { id: 'shade', label: 'Тень' },
-  { id: 'demon', label: 'Демон' },
-  { id: 'yurei', label: 'Юрэй' },
-  { id: 'oni', label: 'Они' },
-  { id: 'yokai', label: 'Ёкай' },
-  { id: 'hantu', label: 'Ханту' },
-  { id: 'goryo', label: 'Горё' },
-  { id: 'myling', label: 'Мюлинг' },
-  { id: 'onryo', label: 'Онрё' },
-  { id: 'the-twins', label: 'Близнецы' },
-  { id: 'raiju', label: 'Райдзю' },
-  { id: 'obake', label: 'Обакэ' },
-  { id: 'the-mimic', label: 'Мимик' },
-  { id: 'moroi', label: 'Морой' },
-  { id: 'deogen', label: 'Деоген' },
-  { id: 'thaye', label: 'Тайэ' },
-] satisfies Array<{ id: GhostId; label: string }>;
+const ghostButtons = [
+  GhostId.Spirit,
+  GhostId.Wraith,
+  GhostId.Phantom,
+  GhostId.Poltergeist,
+  GhostId.Banshee,
+  GhostId.Jinn,
+  GhostId.Mare,
+  GhostId.Revenant,
+  GhostId.Shade,
+  GhostId.Demon,
+  GhostId.Yurei,
+  GhostId.Oni,
+  GhostId.Yokai,
+  GhostId.Hantu,
+  GhostId.Goryo,
+  GhostId.Myling,
+  GhostId.Onryo,
+  GhostId.TheTwins,
+  GhostId.Raiju,
+  GhostId.Obake,
+  GhostId.TheMimic,
+  GhostId.Moroi,
+  GhostId.Deogen,
+  GhostId.Thaye,
+] as const satisfies GhostId[];
+
+const store = useSettings();
 </script>
 
 <template>
   <div class="possible-ghosts">
     <h2 class="heading">Возможные призраки</h2>
-    <div class="list">
-      <button
-        v-for="ghost in ghosts"
-        :key="ghost.id"
-        class="ghost-button"
-        @click="selectedGhost = selectedGhost !== ghost.id ? ghost.id : null"
+    <TransitionGroup
+      name="ghost-list"
+      class="ghost-list"
+      tag="ul"
+    >
+      <li
+        v-for="ghostId in store.showAllGhosts
+          ? ghostButtons
+          : ghostButtons.filter((ghostId) => store.possibleGhosts.has(ghostId))"
+        :key="ghostId"
       >
-        <span :class="['ghost-label', { selected: selectedGhost === ghost.id }]">
-          {{ ghost.label }}
-        </span>
-      </button>
-    </div>
+        <button
+          class="ghost-button"
+          @click="store.selectedGhostId = store.selectedGhostId === ghostId ? null : ghostId"
+        >
+          <span
+            :class="[
+              'ghost-label',
+              {
+                impossible: !store.possibleGhosts.has(ghostId),
+                selected: store.selectedGhostId === ghostId,
+              },
+            ]"
+          >
+            {{ ghostsData.get(ghostId)?.label ?? ghostId }}
+          </span>
+        </button>
+      </li>
+    </TransitionGroup>
   </div>
 </template>
 
@@ -82,10 +101,39 @@ const ghosts = [
   }
 }
 
-.list {
+.ghost-list {
+  position: relative;
+
+  overflow: hidden;
   display: grid;
   grid-template-columns: repeat(3, 1fr);
+
   width: 100%;
+  margin-block: 0;
+  padding-inline-start: 0;
+
+  list-style: none;
+
+  .ghost-list-move,
+  .ghost-list-enter-active,
+  .ghost-list-leave-active {
+    transition:
+      transform 0.3s ease,
+      opacity 0.3s ease;
+  }
+
+  .ghost-list-enter-from,
+  .ghost-list-leave-to {
+    transform: translateX(1.875rem);
+    opacity: 0;
+  }
+
+  .ghost-list-leave-active {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
 }
 
 .ghost-button {
@@ -93,6 +141,8 @@ const ghosts = [
   align-items: center;
   justify-content: center;
 
+  width: 100%;
+  height: 100%;
   padding: 0.9375rem 0.1875rem;
   border: unset;
 
@@ -115,7 +165,13 @@ const ghosts = [
   font-size: var(--text-base);
   line-height: 1;
   color: #f0f0f0;
-  transition: color 0.3s;
+  transition:
+    color 0.3s,
+    opacity 0.3s;
+
+  &.impossible {
+    opacity: 0.5;
+  }
 
   &.selected {
     font-weight: 700;

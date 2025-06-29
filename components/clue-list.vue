@@ -1,65 +1,84 @@
 <script setup lang="ts">
-const clues = ref<Array<{ id: ClueId; label: string; status: ClueStatus }>>([
-  { id: 'emf-level-5', label: 'ЭМП 5 уровня', status: 'positive' },
-  { id: 'ultraviolet', label: 'Ультрафиолет', status: 'neutral' },
-  { id: 'ghost-writing', label: 'Записи в блокноте', status: 'neutral' },
-  { id: 'freezing-temperatures', label: 'Минусовая температура', status: 'neutral' },
-  { id: 'dots-projector', label: 'Лазерный проектор', status: 'neutral' },
-  { id: 'ghost-orb', label: 'Призрачный огонёк', status: 'neutral' },
-  { id: 'spirit-box', label: 'Радиоприёмник', status: 'neutral' },
-  { id: 'disturbed-salt-pile', label: 'След на соли', status: 'neutral' },
-]);
+import { ClueId, ClueStatus } from '~/utils';
+
+const clueItems = [
+  ClueId.EmfLevel5,
+  ClueId.Ultraviolet,
+  ClueId.GhostWriting,
+  ClueId.FreezingTemperatures,
+  ClueId.DotsProjector,
+  ClueId.GhostOrb,
+  ClueId.SpiritBox,
+  ClueId.DisturbedSaltPile,
+] as const satisfies ClueId[];
+
+const clueItemButtons = [
+  { id: ClueStatus.Found, icon: 'fa6-solid:check', label: 'Подтвердить' },
+  { id: ClueStatus.Null, icon: 'fa6-solid:arrow-rotate-left', label: 'Сбросить' },
+  { id: ClueStatus.Excluded, icon: 'fa6-solid:xmark', label: 'Вычеркнуть' },
+] as const satisfies Array<{ id: ClueStatus; icon: string; label: string }>;
+
+const formId = useId();
+
+const store = useSettings();
 </script>
 
 <template>
-  <div class="clue-list">
+  <form
+    class="clue-list"
+    @submit.prevent
+  >
     <div class="header">
       <h2 class="heading">Улики</h2>
       <button
         class="reset-button"
         aria-label="Сбросить всё"
+        @click="store.resetClues"
       >
         <Icon name="fa6-solid:arrows-rotate" />
       </button>
     </div>
     <div class="list">
-      <div
-        v-for="clue in clues"
-        :key="clue.id"
-        :class="['clue', { [clue.status]: clue.status !== 'neutral' }]"
+      <fieldset
+        v-for="clueId in clueItems"
+        :key="clueId"
+        :class="[
+          'clue',
+          {
+            'positive': store.clueStates[clueId] === ClueStatus.Found,
+            'negative': store.clueStates[clueId] === ClueStatus.Excluded,
+            'inactive': !store.isClueRelevant(clueId),
+            'highlighted-by-ghost':
+              store.selectedGhostId && ghostsData.get(store.selectedGhostId)?.clues.has(clueId),
+          },
+        ]"
       >
-        <span class="clue-label">
-          {{ clue.label }}
-        </span>
-        <div class="clue-buttons">
-          <button
-            class="clue-button"
-            :disabled="clue.status === 'positive'"
-            aria-label="Подтвердить"
-            @click="clue.status = 'positive'"
+        <legend class="clue-label">
+          {{ cluesData.get(clueId) ?? clueId }}
+        </legend>
+        <template
+          v-for="button in clueItemButtons"
+          :key="button.id"
+        >
+          <input
+            :id="`${formId}-${clueId}-${button.id}`"
+            v-model="store.clueStates[clueId]"
+            type="radio"
+            class="clue-button-input sr-only"
+            :name="`${formId}-${clueId}`"
+            :value="button.id"
+          />
+          <label
+            :for="`${formId}-${clueId}-${button.id}`"
+            class="clue-button-label"
+            :aria-label="button.label"
           >
-            <Icon name="fa6-solid:check" />
-          </button>
-          <button
-            class="clue-button"
-            :disabled="clue.status === 'neutral'"
-            aria-label="Сбросить"
-            @click="clue.status = 'neutral'"
-          >
-            <Icon name="fa6-solid:arrow-rotate-left" />
-          </button>
-          <button
-            class="clue-button"
-            :disabled="clue.status === 'negative'"
-            aria-label="Вычеркнуть"
-            @click="clue.status = 'negative'"
-          >
-            <Icon name="fa6-solid:xmark" />
-          </button>
-        </div>
-      </div>
+            <Icon :name="button.icon" />
+          </label>
+        </template>
+      </fieldset>
     </div>
-  </div>
+  </form>
 </template>
 
 <style scoped lang="scss">
@@ -138,10 +157,10 @@ const clues = ref<Array<{ id: ClueId; label: string; status: ClueStatus }>>([
   }
 
   &::before {
+    pointer-events: none;
     content: attr(aria-label);
 
     position: absolute;
-    z-index: -1;
     bottom: 125%;
 
     padding: 0.375rem;
@@ -169,7 +188,6 @@ const clues = ref<Array<{ id: ClueId; label: string; status: ClueStatus }>>([
     background-color: #9e9e9e;
 
     &::before {
-      z-index: unset;
       opacity: 1;
     }
   }
@@ -187,8 +205,15 @@ const clues = ref<Array<{ id: ClueId; label: string; status: ClueStatus }>>([
   align-items: center;
 
   padding: 0.375rem 0.5rem;
+  border: unset;
 
-  transition: background-color 0.3s ease;
+  transition:
+    background-color 0.3s ease,
+    box-shadow 0.3s ease;
+
+  &.highlighted-by-ghost {
+    box-shadow: inset 0 0 0.125rem 0.125rem #ffd700;
+  }
 
   &:not(:last-child) {
     border-bottom: 0.0625rem solid #444;
@@ -208,6 +233,7 @@ const clues = ref<Array<{ id: ClueId; label: string; status: ClueStatus }>>([
 }
 
 .clue-label {
+  float: left;
   flex-grow: 1;
   font-size: var(--text-sm);
   line-height: 1;
@@ -217,12 +243,11 @@ const clues = ref<Array<{ id: ClueId; label: string; status: ClueStatus }>>([
   }
 }
 
-.clue-buttons {
-  display: flex;
-  gap: 0.3125rem;
+.clue.inactive .clue-label {
+  opacity: 0.5;
 }
 
-.clue-button {
+.clue-button-label {
   position: relative;
 
   display: flex;
@@ -231,7 +256,6 @@ const clues = ref<Array<{ id: ClueId; label: string; status: ClueStatus }>>([
 
   width: 2.25rem;
   height: 2.25rem;
-  border: unset;
   border-radius: 0.1875rem;
 
   color: #eee;
@@ -241,10 +265,10 @@ const clues = ref<Array<{ id: ClueId; label: string; status: ClueStatus }>>([
   transition: background-color 0.3s ease;
 
   &::before {
+    pointer-events: none;
     content: attr(aria-label);
 
     position: absolute;
-    z-index: -1;
     bottom: 125%;
 
     padding: 0.375rem;
@@ -268,19 +292,24 @@ const clues = ref<Array<{ id: ClueId; label: string; status: ClueStatus }>>([
     }
   }
 
-  &:enabled {
-    cursor: pointer;
-  }
-
   @include hover {
     &::before {
-      z-index: unset;
       opacity: 1;
     }
+  }
+}
 
-    &:enabled {
+.clue-button-input {
+  &:not(:checked) + .clue-button-label {
+    cursor: pointer;
+
+    @include hover {
       background-color: #777;
     }
+  }
+
+  &:focus-visible + .clue-button-label {
+    outline: 0.0625rem auto #101010;
   }
 }
 </style>

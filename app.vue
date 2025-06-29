@@ -1,5 +1,3 @@
-<script setup></script>
-
 <template>
   <div class="app">
     <h1 class="heading"> Phasmophobia Ghost Identifier </h1>

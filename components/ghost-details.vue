@@ -1,32 +1,35 @@
 <script setup lang="ts">
-const mock = {
-  heading: 'Ревенант',
-  description:
-    'Во время охоты движется очень медленно (1 м/с), пока не получит прямую видимость игрока (3 м/с). Это делает крайне важным спрятаться как можно скорее после начала охоты. Потеряв прямую видимость, он сохраняет скорость до достижения последней известной позиции игрока, которого видел. Скорость призрака постепенно снижается после потери прямой видимости.',
-  clues: [
-    { id: '1', label: 'Записи в блокноте' },
-    { id: '2', label: 'Минусовая температура' },
-    { id: '3', label: 'Призрачный огонёк' },
-    { id: '4', label: 'След на соли' },
-  ],
-};
+const store = useSettings();
 </script>
 
 <template>
-  <div class="ghost-details">
-    <h2 class="heading"> {{ mock.heading }} </h2>
-    <p class="description"> {{ mock.description }} </p>
-    <h3 class="subheading">Улики:</h3>
-    <ul class="clues">
-      <li
-        v-for="clue in mock.clues"
-        :key="clue.id"
-        class="clue"
-      >
-        {{ clue.label }}
-      </li>
-    </ul>
-  </div>
+  <Transition
+    name="fade"
+    mode="out-in"
+  >
+    <div
+      v-if="store.selectedGhostId !== null && ghostsData.has(store.selectedGhostId)"
+      :key="store.selectedGhostId"
+      class="ghost-details"
+    >
+      <h2 class="heading">
+        {{ ghostsData.get(store.selectedGhostId)?.label }}
+      </h2>
+      <p class="description">
+        {{ ghostsData.get(store.selectedGhostId)?.description }}
+      </p>
+      <h3 class="subheading">Улики:</h3>
+      <ul class="clues">
+        <li
+          v-for="clueId in ghostsData.get(store.selectedGhostId)?.clues"
+          :key="clueId"
+          class="clue"
+        >
+          {{ cluesData.get(clueId) ?? clueId }}
+        </li>
+      </ul>
+    </div>
+  </Transition>
 </template>
 
 <style scoped lang="scss">
@@ -77,7 +80,7 @@ const mock = {
   margin-block: 0;
   padding: 0.25rem;
   font-size: var(--text-xs);
-  line-height: 1.2;
+  line-height: 1.6;
 
   @include breakpoint-xs {
     font-size: var(--text-sm);
@@ -129,5 +132,15 @@ const mock = {
   @include breakpoint-md {
     font-size: var(--text-lg);
   }
+}
+
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.3s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
 }
 </style>
