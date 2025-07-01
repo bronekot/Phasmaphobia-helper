@@ -47,6 +47,7 @@ const store = useSettings();
 <template>
   <div class="difficulty-selector">
     <h2 class="heading"> Выберите сложность: </h2>
+
     <form
       class="difficulties"
       @submit.prevent
