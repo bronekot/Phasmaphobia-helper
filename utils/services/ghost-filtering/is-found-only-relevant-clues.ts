@@ -6,7 +6,7 @@ export function isFoundOnlyRelevantClues(ghost: Ghost, foundClues: ReadonlySet<C
   const ghostClues = ghost.clues;
 
   for (const foundClue of foundClues) {
-    if (!ghostClues.has(foundClue)) {
+    if (!ghostClues.has(foundClue) && !ghost.ignoredClues?.has(foundClue)) {
       return false;
     }
   }

@@ -18,7 +18,7 @@ export function isExcludedCountWithinLimit(
   }
 
   for (const excludedClue of excludedClues) {
-    if (ghostClues.has(excludedClue)) {
+    if (ghostClues.has(excludedClue) && !ghost.ignoredClues?.has(excludedClue)) {
       allowedMatches -= 1;
 
       if (allowedMatches < 0) {

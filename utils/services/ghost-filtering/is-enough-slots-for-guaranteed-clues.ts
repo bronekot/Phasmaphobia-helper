@@ -2,6 +2,7 @@ import type { Ghost } from '~/utils/models/ghosts-data';
 import { hiddenCluesCounts } from '~/utils/models/hidden-clues-counts';
 import type { ClueId } from '~/utils/schemas/clue-id.schema';
 import type { GameDifficultyId } from '~/utils/schemas/game-difficulty-id.schema';
+import { getNotIgnoredCluesCount } from './get-not-ignored-clues-count';
 
 /** Возвращает `true`, если для гарантированных улик достаточно слотов */
 export function isEnoughSlotsForGuaranteedClues(
@@ -27,5 +28,8 @@ export function isEnoughSlotsForGuaranteedClues(
     }
   }
 
-  return missingGuaranteedCluesCount <= ghost.clues.size - hiddenCluesCount - foundClues.size;
+  return (
+    missingGuaranteedCluesCount <=
+    ghost.clues.size - hiddenCluesCount - getNotIgnoredCluesCount(ghost, foundClues)
+  );
 }

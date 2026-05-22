@@ -2,6 +2,7 @@ import type { Ghost } from '~/utils/models/ghosts-data';
 import { hiddenCluesCounts } from '~/utils/models/hidden-clues-counts';
 import type { ClueId } from '~/utils/schemas/clue-id.schema';
 import type { GameDifficultyId } from '~/utils/schemas/game-difficulty-id.schema';
+import { getNotIgnoredCluesCount } from './get-not-ignored-clues-count';
 
 /** Возвращает `true`, если найдено максимум улик и найдены все гарантированные улики */
 export function isNotAtMaxCluesOrAllGuaranteedFound(
@@ -15,7 +16,7 @@ export function isNotAtMaxCluesOrAllGuaranteedFound(
     throw new Error(`Не найдено количество скрытых подсказок для сложности ${difficulty}!`);
   }
 
-  if (foundClues.size < ghost.clues.size - hiddenCluesCount) {
+  if (getNotIgnoredCluesCount(ghost, foundClues) < ghost.clues.size - hiddenCluesCount) {
     return true;
   }
 

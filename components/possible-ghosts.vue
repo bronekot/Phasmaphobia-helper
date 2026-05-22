@@ -26,6 +26,9 @@ const ghostButtons = [
   GhostId.Moroi,
   GhostId.Deogen,
   GhostId.Thaye,
+  GhostId.Dayan,
+  GhostId.Gallu,
+  GhostId.Obambo,
 ] as const satisfies GhostId[];
 
 const store = useSettings();

@@ -6,6 +6,7 @@ export interface Ghost {
   readonly description: string;
   readonly clues: ReadonlySet<ClueId>;
   readonly guaranteedClues: ReadonlySet<ClueId>;
+  readonly ignoredClues?: ReadonlySet<ClueId>;
 }
 
 export const ghostsData: ReadonlyMap<GhostId, Ghost> = new Map([
@@ -359,6 +360,51 @@ export const ghostsData: ReadonlyMap<GhostId, Ghost> = new Map([
       clues: new Set([
         ClueId.GhostWriting,
         ClueId.GhostOrb,
+        ClueId.DotsProjector,
+        ClueId.DisturbedSaltPile,
+      ]),
+      guaranteedClues: new Set([ClueId.DisturbedSaltPile]),
+    },
+  ],
+  [
+    GhostId.Dayan,
+    {
+      label: 'Даян',
+      description:
+        'Ускоряется и может начинать охоту раньше, если игрок движется рядом с ней. Если ближайший игрок стоит неподвижно рядом, становится медленнее и начинает охоту позже. Всегда имеет женское имя и женскую модель призрака.',
+      clues: new Set([
+        ClueId.EmfLevel5,
+        ClueId.GhostOrb,
+        ClueId.SpiritBox,
+        ClueId.DisturbedSaltPile,
+      ]),
+      guaranteedClues: new Set([ClueId.DisturbedSaltPile]),
+    },
+  ],
+  [
+    GhostId.Gallu,
+    {
+      label: 'Галлу',
+      description:
+        'Становится агрессивнее после использования защитного снаряжения: распятия, благовония или соли. В разъярённом состоянии быстрее охотится, имеет более высокий порог охоты и не наступает в соль. После охоты в разъярённом состоянии ослабевает.',
+      clues: new Set([
+        ClueId.EmfLevel5,
+        ClueId.Ultraviolet,
+        ClueId.SpiritBox,
+      ]),
+      guaranteedClues: new Set(),
+      ignoredClues: new Set([ClueId.DisturbedSaltPile]),
+    },
+  ],
+  [
+    GhostId.Obambo,
+    {
+      label: 'Обамбо',
+      description:
+        'Переключается между спокойным и агрессивным состояниями. В спокойном состоянии охотится поздно и движется медленнее; в агрессивном — охотится раньше и движется быстрее. Охота, начатая в агрессивном состоянии, длится на 20% меньше.',
+      clues: new Set([
+        ClueId.GhostWriting,
+        ClueId.Ultraviolet,
         ClueId.DotsProjector,
         ClueId.DisturbedSaltPile,
       ]),
