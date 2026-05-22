@@ -26,6 +26,8 @@ export const GhostId = {
   Dayan: 'Dayan',
   Gallu: 'Gallu',
   Obambo: 'Obambo',
+  Aswang: 'Aswang',
+  Kormos: 'Kormos',
 } as const;
 
 export type GhostId = ValueOf<typeof GhostId>;

@@ -411,4 +411,34 @@ export const ghostsData: ReadonlyMap<GhostId, Ghost> = new Map([
       guaranteedClues: new Set([ClueId.DisturbedSaltPile]),
     },
   ],
+  [
+    GhostId.Aswang,
+    {
+      label: 'Асванг',
+      description:
+        'Имеет пониженную базовую скорость охоты (1.53 м/с), но быстрее других призраков разгоняется при прямой видимости игрока и может достигать 2.53 м/с примерно за 17.33 секунды. Иногда может начинать охоту без grace period. Не может убить игрока, который правильно спрятался в официальном укрытии, но при таком завершении охоты запоминает его позицию для следующей охоты.',
+      clues: new Set([
+        ClueId.DotsProjector,
+        ClueId.FreezingTemperatures,
+        ClueId.GhostWriting,
+        ClueId.DisturbedSaltPile,
+      ]),
+      guaranteedClues: new Set([ClueId.DisturbedSaltPile]),
+    },
+  ],
+  [
+    GhostId.Kormos,
+    {
+      label: 'Кормос',
+      description:
+        'Слепой призрак: во время охоты не видит игроков по прямой видимости, но очень хорошо слышит движение, голос и электронику. Обычный порог охоты 50%, но повышается до 70%, если игрок спринтит в одной комнате с ним. Во время охоты слышит движение на том же этаже: присед 10 м, ходьба 15 м, спринт 30 м. Может убить игрока на расстоянии 1.5 м, игнорируя препятствия вроде мебели или стен.',
+      clues: new Set([
+        ClueId.GhostOrb,
+        ClueId.SpiritBox,
+        ClueId.Ultraviolet,
+        ClueId.DisturbedSaltPile,
+      ]),
+      guaranteedClues: new Set([ClueId.DisturbedSaltPile]),
+    },
+  ],
 ]);
