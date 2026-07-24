@@ -352,6 +352,21 @@ export const ghostsData: ReadonlyMap<GhostId, Ghost> = new Map([
     },
   ],
   [
+    GhostId.Deildegast,
+    {
+      label: 'Дейльдегаст',
+      description:
+        'В начале расследования движется очень быстро во время охоты. Перемещение уникальных предметов окружения до следующей охоты постепенно замедляет его; помочь могут как живые, так и мёртвые игроки. Не ускоряется при прямой видимости игрока.',
+      clues: new Set([
+        ClueId.EmfLevel5,
+        ClueId.GhostWriting,
+        ClueId.DotsProjector,
+        ClueId.DisturbedSaltPile,
+      ]),
+      guaranteedClues: new Set([ClueId.DisturbedSaltPile]),
+    },
+  ],
+  [
     GhostId.Thaye,
     {
       label: 'Тайэ',

@@ -5,6 +5,7 @@ const ghostButtons = [
   GhostId.Aswang,
   GhostId.Banshee,
   GhostId.Dayan,
+  GhostId.Deildegast,
   GhostId.Demon,
   GhostId.Deogen,
   GhostId.Gallu,

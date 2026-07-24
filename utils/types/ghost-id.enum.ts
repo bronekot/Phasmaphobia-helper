@@ -22,6 +22,7 @@ export const GhostId = {
   TheMimic: 'TheMimic',
   Moroi: 'Moroi',
   Deogen: 'Deogen',
+  Deildegast: 'Deildegast',
   Thaye: 'Thaye',
   Dayan: 'Dayan',
   Gallu: 'Gallu',
